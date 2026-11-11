@@ -6,6 +6,7 @@ export default defineConfig({
   // Component tests mount in jsdom and need Svelte's client build.
   resolve: { conditions: ['browser'] },
   test: {
+    setupFiles: ['./vitest.setup.ts'],
     include: ['components/**/*.test.ts', 'scripts/**/*.test.ts'],
   },
 });

@@ -3,7 +3,8 @@
 // `{{}}` empty (decoy) gap, escapes `\{{`, `\}}` and a leading `\~`. See COMPONENT.md.
 
 import { correctFlags, templatePercent } from './score.ts';
-import type { GapState, TemplateGap } from './types.ts';
+import { shuffled } from './shuffle.ts';
+import type { GapState, TemplateGap, TemplatePuzzle, Tile } from './types.ts';
 
 export type Segment = { text: string } | { gap: number };
 
@@ -219,4 +220,26 @@ export function evaluateTemplate(template: string, tileText: Map<string, string>
     })
   );
   return { percent: templatePercent(parsed.gaps, placed), lines };
+}
+
+export interface TemplateSetup {
+  /** The code with gaps, for the UI. Says nothing about what belongs in a gap. */
+  lines: Segment[][];
+  /** Shuffled pool tiles. Ids follow the shuffled order, so they say nothing about the solution. */
+  tiles: Tile[];
+  /** Piece id -> text, for evaluateTemplate. */
+  textOf: Map<string, string>;
+}
+
+/** Practice mode: everything the UI and the scoring need for a (valid) template puzzle. */
+export function templateSetup(puzzle: TemplatePuzzle, seed: number): TemplateSetup {
+  const parsed = parseTemplate(puzzle.template);
+  const pool = shuffled(buildPool(parsed, puzzle.redHerrings, puzzle.reusable).tiles, seed);
+  const textOf = new Map<string, string>();
+  const tiles = pool.map((tile, i): Tile => {
+    const pieceId = `t${i}`;
+    textOf.set(pieceId, tile.text);
+    return { pieceId, text: tile.text, reusable: tile.reusable };
+  });
+  return { lines: parsed.lines, tiles, textOf };
 }

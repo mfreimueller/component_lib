@@ -5,10 +5,6 @@ import type { PlacedLine } from '../core/types.ts';
 import LinePuzzle from './LinePuzzle.svelte';
 import LineReview from './LineReview.svelte';
 
-// jsdom has no Web Animations API; svelte's animate:flip needs it.
-Element.prototype.getAnimations ??= () => [];
-Element.prototype.animate ??= () => ({ cancel() {}, finished: Promise.resolve(), onfinish: null }) as unknown as Animation;
-
 const pieces = [
   { pieceId: 'p0', code: 'print(i)', indent: 1 },
   { pieceId: 'p1', code: 'for i in range(3):', indent: 0 },

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildPool, evaluateTemplate, parseTemplate } from './template.ts';
+import { buildPool, evaluateTemplate, parseTemplate, templateSetup } from './template.ts';
 
 const expectedOf = (src: string) => parseTemplate(src).gaps.map((g) => g.expected);
 const errorsOf = (src: string) => parseTemplate(src).errors;
@@ -127,5 +127,25 @@ describe('evaluateTemplate', () => {
 
   it('scores 0 when nothing is placed', () => {
     expect(evaluateTemplate(src, text, {}).percent).toBe(0);
+  });
+});
+
+describe('templateSetup', () => {
+  const puzzle = { kind: 'template' as const, title: 'T', description: '', template: '{{SELECT}} {{a}}\n{{SELECT}} {{b}}', redHerrings: ['x'], reusable: ['SELECT'] };
+
+  it('gives lines, shuffled tiles with neutral ids and their texts', () => {
+    const s = templateSetup(puzzle, 3);
+    expect(s.lines).toEqual(parseTemplate(puzzle.template).lines);
+    expect(s.tiles.map((t) => t.pieceId)).toEqual(['t0', 't1', 't2', 't3']);
+    expect(s.tiles.map((t) => t.text).sort()).toEqual(['SELECT', 'a', 'b', 'x']);
+    expect(s.tiles.find((t) => t.text === 'SELECT')!.reusable).toBe(true);
+    expect(templateSetup(puzzle, 3)).toEqual(s);
+  });
+
+  it('works with evaluateTemplate', () => {
+    const s = templateSetup(puzzle, 3);
+    const id = (text: string) => s.tiles.find((t) => t.text === text)!.pieceId;
+    const out = evaluateTemplate(puzzle.template, s.textOf, { '0': [id('SELECT'), id('a')], '1': [id('SELECT'), id('b')] });
+    expect(out.percent).toBe(100);
   });
 });
