@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+*.log
+
+# site
+site/.svelte-kit/
+site/build/
+site/static/embed/
+
+# playwright
+test-results/
+playwright-report/

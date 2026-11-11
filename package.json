@@ -1,0 +1,22 @@
+{
+  "name": "component_lib",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Reusable components for agents to copy into projects, with a human showcase site.",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "check": "tsc --noEmit && svelte-check --tsconfig ./tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "svelte": "^5.57.3",
+    "svelte-check": "^4.7.8",
+    "typescript": "^6.0.3",
+    "vitest": "^5.1.0"
+  }
+}
