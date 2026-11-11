@@ -43,6 +43,16 @@ describe('LinePuzzle', () => {
     expect(onchange).toHaveBeenLastCalledWith([{ pieceId: 'p0', indent: 1 }]);
   });
 
+  it('places a piece only once when clicked twice in one task', () => {
+    const { onchange, codes, piece } = setup({});
+    const p = piece('pool', 'print');
+    p.click();
+    p.click();
+    flushSync();
+    expect(codes('solution')).toEqual(['print(i)']);
+    expect(onchange).toHaveBeenLastCalledWith([{ pieceId: 'p0', indent: 1 }]);
+  });
+
   it('moves pieces with Enter', () => {
     const { onchange, piece } = setup({});
     piece('pool', 'print').dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));

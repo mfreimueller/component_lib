@@ -44,59 +44,67 @@
   const tone = $derived(solution.length > 0 && right === solution.length ? 'ok' : right === 0 ? 'bad' : 'mid');
 </script>
 
-<div class="parsons-review" class:single={!showSolution}>
-  <section class="panel" aria-labelledby="{uid}-mine">
-    <header>
-      <h3 id="{uid}-mine">{t.mine}</h3>
-      <span class="pill {tone}">{t.correctOf(right, solution.length)}</span>
-    </header>
-    {#if submission.length === 0}
-      <p class="empty">{t.nothingPlaced}</p>
-    {:else}
-      <ol>
-        {#each submission as line, i (i)}
-          <li class:right={line.correct} class:wrong={!line.correct}>
-            <code style:padding-left="calc(var(--pz-indent) * {line.indent})">{line.code}</code>
-            <span class="sr">{line.correct ? t.right : t.wrong}</span>
-            <span aria-hidden="true" class="mark">{line.correct ? '✓' : '✕'}</span>
-          </li>
-        {/each}
-      </ol>
-    {/if}
-  </section>
-
-  {#if showSolution}
-    <section class="panel" aria-labelledby="{uid}-solution">
+<div class="parsons-review">
+  <div class="panels" class:single={!showSolution}>
+    <div class="panel" role="group" aria-labelledby="{uid}-mine">
       <header>
-        <h3 id="{uid}-solution">{t.solution}</h3>
-        <span class="pill ok">{t.correctAnswer}</span>
+        <h3 id="{uid}-mine">{t.mine}</h3>
+        <span class="pill {tone}">{t.correctOf(right, solution.length)}</span>
       </header>
-      <ol>
-        {#each solution as line, i (i)}
-          <li><code style:padding-left="calc(var(--pz-indent) * {line.indent})">{line.code}</code></li>
-        {/each}
-      </ol>
-      {#if redHerrings.length > 0}
-        <h4>{t.herrings}</h4>
-        <ul>
-          {#each redHerrings as line, i (i)}
-            <li class="herring"><code>{line.code}</code></li>
+      {#if submission.length === 0}
+        <p class="empty">{t.nothingPlaced}</p>
+      {:else}
+        <ol>
+          {#each submission as line, i (i)}
+            <li class:right={line.correct} class:wrong={!line.correct}>
+              <code style:padding-left="calc(var(--pz-indent) * {line.indent})">{line.code}</code>
+              <span class="sr">{line.correct ? t.right : t.wrong}</span>
+              <span aria-hidden="true" class="mark">{line.correct ? '✓' : '✕'}</span>
+            </li>
           {/each}
-        </ul>
+        </ol>
       {/if}
-    </section>
-  {/if}
+    </div>
+
+    {#if showSolution}
+      <div class="panel" role="group" aria-labelledby="{uid}-solution">
+        <header>
+          <h3 id="{uid}-solution">{t.solution}</h3>
+          <span class="pill ok">{t.correctAnswer}</span>
+        </header>
+        <ol>
+          {#each solution as line, i (i)}
+            <li><code style:padding-left="calc(var(--pz-indent) * {line.indent})">{line.code}</code></li>
+          {/each}
+        </ol>
+        {#if redHerrings.length > 0}
+          <h4>{t.herrings}</h4>
+          <ul>
+            {#each redHerrings as line, i (i)}
+              <li class="herring"><code>{line.code}</code></li>
+            {/each}
+          </ul>
+        {/if}
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style>
   .parsons-review {
+    container-type: inline-size;
+    text-align: start;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--pz-text);
+  }
+  .panels {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
     align-items: start;
-    color: var(--pz-text);
   }
-  .parsons-review.single {
+  .panels.single {
     grid-template-columns: minmax(0, 1fr);
   }
   .panel {
@@ -114,12 +122,25 @@
     align-items: center;
     gap: 8px;
   }
-  h3 {
+  .parsons-review h3 {
     margin: 0;
+    font-family: inherit;
+    line-height: 1.3;
+    text-transform: none;
+    letter-spacing: normal;
+    text-shadow: none;
+    color: inherit;
     font-size: 15px;
     font-weight: 600;
   }
-  h4 {
+  .parsons-review h4 {
+    margin: 0;
+    font-family: inherit;
+    line-height: 1.3;
+    text-transform: none;
+    letter-spacing: normal;
+    text-shadow: none;
+    color: inherit;
     margin: 8px 0 0;
     color: var(--pz-text-muted);
     font-size: 12px;
@@ -144,8 +165,8 @@
     background: var(--pz-danger-soft);
     color: var(--pz-danger);
   }
-  ol,
-  ul {
+  .parsons-review ol,
+  .parsons-review ul {
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -153,7 +174,7 @@
     padding: 0;
     list-style: none;
   }
-  li {
+  .parsons-review li {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -177,7 +198,7 @@
     border: 1px dashed var(--pz-warn);
     background: var(--pz-warn-soft);
   }
-  code {
+  .parsons-review code {
     min-width: 0;
     font: inherit;
     white-space: pre;
@@ -208,8 +229,8 @@
     overflow: hidden;
     clip: rect(0 0 0 0);
   }
-  @media (max-width: 700px) {
-    .parsons-review {
+  @container (max-width: 700px) {
+    .panels {
       grid-template-columns: minmax(0, 1fr);
       gap: 12px;
     }

@@ -45,6 +45,7 @@ Order follows dependencies. Each task is one short branch and one or more atomic
 ## Phase 3a: Embed
 
 **T7a. Spike: drag and drop in a scaled Reveal slide**
+- Done: findings and fixes in SPEC §6a.
 - A throwaway deck with `LinePuzzle` mounted in a slide, at several window sizes (scale < 1 and
   > 1), mouse, touch and keyboard.
 - Done when: we know whether `svelte-dnd-action` works under Reveal's scaling and which fixes are

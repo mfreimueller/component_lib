@@ -266,10 +266,31 @@ compiled a second time as custom elements into one ES module per component.
 - Theming through the same CSS custom properties (they pass into shadow DOM).
 - Practice mode only (the page holds the whole puzzle).
 - **Reveal.js rules**: key events inside the element must not reach Reveal (Space, arrows); the
-  element sets `data-prevent-swipe`; drag and drop must work while Reveal scales the slide
-  (transform or `zoom`). Speaker view is an independent copy and PDF export shows the start state;
-  both are documented, not fixed.
+  element sets `data-prevent-swipe`; drag and drop must work while Reveal scales the slide.
+  Speaker view is an independent copy and PDF export shows the start state; both are documented,
+  not fixed.
 - The site includes a small Reveal demo deck that uses the published embed.
+
+### Findings of the Reveal spike (T7a, Reveal 6.0.2, Chrome)
+
+Reveal 6 always scales slides with `transform: scale()` (no `zoom`). Tested with real mouse drags,
+CDP touch drags and keyboard at scales 0.69, 0.96 and 1.51. After the fixes below everything worked
+(template drops 10/10 at every scale). The fixes are in the Svelte components, so they also apply to
+decks that mount the components directly.
+
+| Problem | Cause | Fix |
+|---|---|---|
+| Nothing could be dragged or clicked | Reveal treats every `<section>` inside a slide as a vertical sub-slide (hidden, `pointer-events: none`) | Components use no `<section>` (`div role="group"`) |
+| Drops into small gaps missed (6/10 at 0.69) | The drag copy is appended to `body`, so it is not scaled; its centre drifts from the pointer | `useCursorForDetection: true` |
+| Alt+Arrow (indent, reorder) also changed the slide | Reveal listens on `document` and ignores `preventDefault` | `stopPropagation()` on every key a component handles |
+| A swipe starting on a piece changed the slide | Reveal touch navigation | `data-prevent-swipe` on the puzzle root |
+| Centred code, uppercase headings, list margins | Reveal theme styles (`.reveal h2`, `.reveal ol`, …) | Bare element rules nested under the root class, with resets; `text-align: start` |
+| Layout switched at the wrong size | Media queries use the window, not the slide | Container queries (`container-type: inline-size` on the root) |
+| Puzzle dark on a light deck | Tokens follow the OS colour scheme | Deck sets `data-theme="light"` on `<html>` (embed: a `theme` attribute) |
+
+Not fixed (cosmetic): the drag copy keeps its unscaled size while dragging. Space/arrows during a
+keyboard drag and Enter did not reach Reveal. Automated drag tests need paced moves (one per frame)
+and a short pause before release, because the library checks the pointer on a timer.
 
 ## 7. Commands
 

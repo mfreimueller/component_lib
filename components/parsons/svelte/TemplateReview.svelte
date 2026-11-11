@@ -91,6 +91,10 @@
     clip: rect(0 0 0 0);
   }
   .parsons-template-review {
+    container-type: inline-size;
+    text-align: start;
+    font-size: 14px;
+    line-height: 1.4;
     color: var(--pz-text);
   }
   .code {
@@ -175,13 +179,14 @@
     font-style: italic;
   }
   .herrings {
+    margin: 12px 0 0;
     color: var(--pz-text-muted);
     font-size: 13px;
   }
   .herrings code {
     font: var(--pz-font-size) var(--pz-font-mono);
   }
-  @media (max-width: 700px) {
+  @container (max-width: 700px) {
     .code {
       padding: 12px;
       font-size: 13px;

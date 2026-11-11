@@ -10,3 +10,4 @@ site/static/embed/
 # playwright
 test-results/
 playwright-report/
+spikes/

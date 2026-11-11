@@ -94,6 +94,7 @@
   function onPoolKey(e: KeyboardEvent, chip: Chip) {
     if (e.key !== 'Enter') return;
     e.preventDefault();
+    e.stopPropagation();
     place(chip);
   }
 
@@ -101,9 +102,11 @@
     if (disabled) return;
     if (e.key === 'Enter') {
       e.preventDefault();
+      e.stopPropagation();
       takeBack(g, chip);
     } else if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
       e.preventDefault();
+      e.stopPropagation();
       commit(moveInGap(board, g, chip.id, e.key === 'ArrowRight' ? 1 : -1));
     }
   }
@@ -114,12 +117,16 @@
     type: `parsons-${uid}`,
     dragDisabled: disabled,
     delayTouchStart: true,
+    // Hit-test at the pointer, not at the dragged copy: inside a scaled container (Reveal.js) the copy
+    // is not scaled, so its centre drifts away from the pointer and small gaps get missed.
+    useCursorForDetection: true,
     dropTargetClasses: ['over'],
     dropTargetStyle: {},
   });
 </script>
 
-<div class="parsons-template" class:locked={disabled}>
+<!-- data-prevent-swipe: Reveal.js must not change slides when a swipe starts on the puzzle. -->
+<div class="parsons-template" class:locked={disabled} data-prevent-swipe>
   <p class="sr" id="{uid}-help">{t.help}</p>
 
   <div class="code" role="group" aria-label={t.code} aria-describedby="{uid}-help">
@@ -165,7 +172,7 @@
     {/each}
   </div>
 
-  <section class="pool-box" aria-labelledby="{uid}-pool">
+  <div class="pool-box" role="group" aria-labelledby="{uid}-pool">
     <header>
       <h2 id="{uid}-pool">{t.pool}</h2>
       {#if hasReusable}<span>{t.reusableHint}</span>{/if}
@@ -183,7 +190,7 @@
         </span>
       {/each}
     </div>
-  </section>
+  </div>
 </div>
 
 <style>
@@ -195,6 +202,10 @@
     clip: rect(0 0 0 0);
   }
   .parsons-template {
+    container-type: inline-size;
+    text-align: start;
+    font-size: 14px;
+    line-height: 1.4;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -286,8 +297,14 @@
     flex-wrap: wrap;
     gap: 4px;
   }
-  h2 {
+  .parsons-template h2 {
     margin: 0;
+    font-family: inherit;
+    line-height: 1.3;
+    text-transform: none;
+    letter-spacing: normal;
+    text-shadow: none;
+    color: inherit;
     font-size: 15px;
     font-weight: 600;
   }
@@ -303,7 +320,7 @@
     padding: 2px;
     border-radius: 10px;
   }
-  @media (max-width: 700px) {
+  @container (max-width: 700px) {
     .code {
       padding: 12px;
       font-size: 13px;

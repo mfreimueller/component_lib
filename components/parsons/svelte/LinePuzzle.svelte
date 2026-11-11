@@ -110,14 +110,15 @@
   };
 
   function toSolution(item: Item) {
-    if (disabled) return;
+    // Guard: two clicks in one task (scripts, fast double taps) must not place a piece twice.
+    if (disabled || !pool.some((i) => i.id === item.id)) return;
     pool = pool.filter((i) => i.id !== item.id);
     solution = [...solution, item];
     emit();
   }
 
   function toPool(item: Item) {
-    if (disabled) return;
+    if (disabled || !solution.some((i) => i.id === item.id)) return;
     solution = solution.filter((i) => i.id !== item.id);
     pool = [...pool, { ...item, indent: studentsIndent ? 0 : item.indent }];
     emit();
@@ -133,10 +134,12 @@
     if (disabled || (e.target as HTMLElement).closest('.indent')) return;
     if (e.key === 'Enter') {
       e.preventDefault();
+      e.stopPropagation();
       if (inSolution) toPool(item);
       else toSolution(item);
     } else if (inSolution && studentsIndent && (e.key === 'ArrowRight' || e.key === 'ArrowLeft') && e.altKey) {
       e.preventDefault();
+      e.stopPropagation();
       shift(item, e.key === 'ArrowRight' ? 1 : -1);
     }
   }
@@ -147,6 +150,8 @@
     type: `parsons-${uid}`,
     dragDisabled: disabled,
     delayTouchStart: true,
+    // Hit-test at the pointer, not at the dragged copy (which is not scaled inside a scaled container).
+    useCursorForDetection: true,
     dropTargetClasses: ['over'],
     dropTargetStyle: {},
   });
@@ -176,11 +181,12 @@
   {/if}
 {/snippet}
 
-<div class="parsons">
+<!-- data-prevent-swipe: Reveal.js must not change slides when a swipe starts on the puzzle. -->
+<div class="parsons" data-prevent-swipe>
   <p class="sr" id="{uid}-help">{t.help}</p>
 
   <div class="columns">
-    <section class="column" aria-labelledby="{uid}-pool">
+    <div class="column" role="group" aria-labelledby="{uid}-pool">
       <header>
         <h2 id="{uid}-pool">{t.pool}</h2>
         <span>{t.left(real(pool).length)}</span>
@@ -208,9 +214,9 @@
           </div>
         {/each}
       </div>
-    </section>
+    </div>
 
-    <section class="column mine" aria-labelledby="{uid}-solution">
+    <div class="column mine" role="group" aria-labelledby="{uid}-solution">
       <header>
         <h2 id="{uid}-solution">{t.solution}</h2>
         <span>{t.placed(real(solution).length)}</span>
@@ -239,7 +245,7 @@
           </div>
         {/each}
       </div>
-    </section>
+    </div>
   </div>
 </div>
 
@@ -252,6 +258,10 @@
     clip: rect(0 0 0 0);
   }
   .parsons {
+    container-type: inline-size;
+    text-align: start;
+    font-size: 14px;
+    line-height: 1.4;
     color: var(--pz-text);
   }
   .columns {
@@ -278,7 +288,14 @@
     justify-content: space-between;
     align-items: center;
   }
-  h2 {
+  .parsons h2 {
+    margin: 0;
+    font-family: inherit;
+    line-height: 1.3;
+    text-transform: none;
+    letter-spacing: normal;
+    text-shadow: none;
+    color: inherit;
     font-size: 15px;
     font-weight: 600;
   }
@@ -370,7 +387,7 @@
     opacity: 0.35;
     cursor: not-allowed;
   }
-  @media (max-width: 700px) {
+  @container (max-width: 700px) {
     .columns {
       grid-template-columns: 1fr;
       gap: 12px;
