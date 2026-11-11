@@ -306,7 +306,8 @@ npm test                # vitest: core unit tests + conformance runner, all comp
 npm run check           # svelte-check + tsc
 npm run catalog         # regenerate catalog.json and llms.txt
 npm run dev             # site dev server
-npm run build           # static site in site/build
+npm run build           # embed + static site in site/build (BASE_PATH=/component_lib for Pages)
+npm run test:e2e        # Playwright smoke tests against the built site
 node components/parsons/core/cli.ts <file.json>        # validate a puzzle file (Node 22.18+)
 ```
 

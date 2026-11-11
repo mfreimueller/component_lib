@@ -80,13 +80,19 @@ Order follows dependencies. Each task is one short branch and one or more atomic
 - SvelteKit static, base path from env, home with catalog cards, `/components/parsons` with demos
   per variant and "Check".
 - Done when: `npm run build` works and `npm run preview` shows working demos.
+- Done: SvelteKit 3 static site; the site reaches the components through `site/src/lib/parsons.ts`
+  (Kit 3 deprecates `alias`; subpath imports cannot point outside the package).
 
 **T10. Playground, rules explainer, "Tell your agent"**
 - Done when: editing JSON updates the puzzle; invalid JSON shows errors with line numbers.
+- Done: JSON.parse messages often have no position (Chrome, Safari), so `site/src/lib/json-error.ts`
+  locates syntax errors itself. Rules examples are read from the conformance files.
 
 **T11. CI + Pages deploy**
 - `ci.yml` (check, test, catalog up to date, Playwright smoke), `pages.yml`.
 - Done when: a push to `main` deploys the site.
+- Done: `ci.yml` (check, check:site, test, generated files current, build, Playwright smoke in
+  `e2e/`), `pages.yml` (deploy). Smoke tests run against `vite preview` with the Pages base path.
 
 ## Later
 

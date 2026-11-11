@@ -7,6 +7,6 @@ export default defineConfig({
   resolve: { conditions: ['browser'] },
   test: {
     setupFiles: ['./vitest.setup.ts'],
-    include: ['components/**/*.test.ts', 'scripts/**/*.test.ts'],
+    include: ['components/**/*.test.ts', 'scripts/**/*.test.ts', 'site/src/**/*.test.ts'],
   },
 });

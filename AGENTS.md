@@ -46,9 +46,12 @@ option), tell the user it belongs in component_lib, so the next project gets it 
 
 - `SPEC.md` is the spec (layout, decisions, the Reveal.js findings in §6a). `tasks/plan.md` is the
   plan.
-- Commands: `npm test` (vitest: unit, component and conformance tests), `npm run check`
-  (tsc + svelte-check), `npm run catalog` (regenerate `catalog.json`/`llms.txt`),
-  `npm run build:embed` (custom element bundle into `site/static/embed/`).
+- Commands: `npm test` (vitest: unit, component, conformance and site helper tests),
+  `npm run check` (tsc + svelte-check) and `npm run check:site`, `npm run catalog` (regenerate
+  `catalog.json`/`llms.txt`), `npm run build:skill` (bundled skill validator), `npm run dev` (site),
+  `BASE_PATH=/component_lib npm run build` (embed + site) then `npm run test:e2e` (Playwright smoke).
+- The site (`site/`, SvelteKit 3, static) imports components only through `site/src/lib/parsons.ts`.
+  A new component needs a page under `site/src/routes/components/<name>/`.
 - Core code (`components/*/core/`): erasable TypeScript only (no `enum`, no `namespace`, no
   parameter properties), `.ts` import suffixes, no dependencies, no DOM. Node 22.18+ runs it directly.
 - Svelte components: no `<section>` elements, width-based layout from the component's own width (`bind:clientWidth`, no media or container queries), element
