@@ -16,8 +16,8 @@ Order follows dependencies. Each task is one short branch and one or more atomic
 - Done when: unit tests pass, and Node 22.18+ can import the files directly (no build).
 
 **T3. Template parser and pool**
-- Port `template.ts` (parser, `buildPool`, `LIMITS`) and the board logic from `template_state.ts`
-  (without the svelte-dnd-action specifics, which move to the UI).
+- Port `template.ts` (parser, `buildPool`, `LIMITS`, `evaluateTemplate`) and the board logic from
+  `template_state.ts`. The drag-placeholder helpers stay in `board.ts`: they are pure and tested.
 - Done when: unit tests ported from ParsonXam pass.
 
 **T4. Conformance cases + runner**
