@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Parsons puzzles in Reveal.js</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/white.css" />
+  <!-- 1. One script tag registers <parsons-puzzle>. -->
+  <script type="module" src="../../embed/parsons.js"></script>
+  <style>
+    .reveal pre.snippet { width: 100%; font-size: 0.42em; box-shadow: none; }
+    .reveal pre.snippet code { max-height: 560px; padding: 16px; text-align: left; }
+    .reveal .task { margin: 0 0 16px; color: #555; font-size: 0.6em; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <h2>Loops in Python</h2>
+        <p>Interactive Parsons puzzles in a Reveal.js deck.</p>
+        <p><small>Use → to move on. Drag the pieces, or click them.</small></p>
+      </section>
+
+      <section>
+        <h3>Sum of 1 to n</h3>
+        <p class="task">Read <code>n</code> and print 1 + 2 + … + n. Indent the loop body yourself.</p>
+        <!-- 2. A puzzle: file + index. check/reset add buttons; students-indent lets them indent. -->
+        <parsons-puzzle id="sum" src="puzzles.json" index="0" seed="7" students-indent check reset theme="light"></parsons-puzzle>
+        <!-- 3. Next step of the slide shows the solution (see the script at the end). -->
+        <span class="fragment" data-parsons-solution="sum"></span>
+      </section>
+
+      <section>
+        <h3>Count the even numbers</h3>
+        <p class="task">Print how many numbers in <code>nums</code> are even.</p>
+        <parsons-puzzle src="puzzles.json" index="1" seed="3" check reveal-solution reset theme="light"></parsons-puzzle>
+      </section>
+
+      <section>
+        <h3>SQL: adults only</h3>
+        <p class="task">Name of every user aged 18 or older, youngest first.</p>
+        <parsons-puzzle src="puzzles.json" index="2" seed="5" check reveal-solution reset theme="light"></parsons-puzzle>
+      </section>
+
+      <section>
+        <h3>How this deck works</h3>
+        <pre class="snippet"><code>&lt;script type="module" src="…/embed/parsons.js"&gt;&lt;/script&gt;
+
+&lt;section&gt;
+  &lt;parsons-puzzle id="sum" src="puzzles.json" index="0"
+                  students-indent check reset theme="light"&gt;&lt;/parsons-puzzle&gt;
+  &lt;span class="fragment" data-parsons-solution="sum"&gt;&lt;/span&gt;
+&lt;/section&gt;
+
+deck.on('fragmentshown', (e) =&gt; {
+  const id = e.fragment.dataset.parsonsSolution;
+  if (id) document.getElementById(id).showSolution();
+});
+// re-centre when a puzzle loads or changes size
+const ro = new ResizeObserver(() =&gt; deck.layout());
+document.querySelectorAll('parsons-puzzle').forEach((p) =&gt; ro.observe(p));</code></pre>
+        <p><small>Puzzle files use the same format as ParsonXam. See the component docs.</small></p>
+      </section>
+    </div>
+  </div>
+
+  <script type="module">
+    import Reveal from 'https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.mjs';
+    const deck = new Reveal({ hash: true, transition: 'slide' });
+    // A fragment with data-parsons-solution="<puzzle id>" shows that puzzle's solution.
+    deck.on('fragmentshown', (e) => {
+      const id = e.fragment.dataset.parsonsSolution;
+      if (id) document.getElementById(id)?.showSolution();
+    });
+    // Puzzles load after Reveal has laid out the slide and change size on Check: re-centre then.
+    const relayout = new ResizeObserver(() => deck.layout());
+    document.querySelectorAll('parsons-puzzle').forEach((p) => relayout.observe(p));
+    deck.initialize();
+    window.deck = deck;
+  </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{
+  "puzzles": [
+    {
+      "title": "Sum of 1 to n",
+      "description": "Read n and print 1 + 2 + ... + n.",
+      "solution": [
+        { "code": "n = int(input())", "indent": 0 },
+        { "code": "total = 0", "indent": 0 },
+        { "code": "for i in range(1, n + 1):", "indent": 0 },
+        { "code": "total += i", "indent": 1 },
+        { "code": "print(total)", "indent": 0 }
+      ],
+      "redHerrings": [{ "code": "for i in range(n):", "indent": 0 }]
+    },
+    {
+      "title": "Count the even numbers",
+      "description": "Print how many numbers in nums are even.",
+      "solution": [
+        { "code": "count = 0", "indent": 0 },
+        { "code": "for x in nums:", "indent": 0 },
+        { "code": "if x % 2 == 0:", "indent": 1 },
+        { "code": "count += 1", "indent": 2 },
+        { "code": "print(count)", "indent": 0 }
+      ],
+      "redHerrings": [{ "code": "if x % 2 == 1:", "indent": 1 }]
+    },
+    {
+      "kind": "template",
+      "title": "Adults only",
+      "description": "List the name of every user who is 18 or older, youngest first.",
+      "template": "{{SELECT}} {{name}}\n{{FROM}} {{users}}\n{{WHERE}} {{age >= 18}}\n{{ORDER BY}} {{age}};",
+      "redHerrings": ["HAVING", "age > 18", "DESC"],
+      "reusable": []
+    }
+  ]
+}

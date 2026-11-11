@@ -288,6 +288,12 @@ decks that mount the components directly.
 | Layout switched at the wrong size | Media queries use the window, not the slide | Container queries (`container-type: inline-size` on the root) |
 | Puzzle dark on a light deck | Tokens follow the OS colour scheme | Deck sets `data-theme="light"` on `<html>` (embed: a `theme` attribute) |
 
+Found while building the demo deck (T7c): Reveal centres a slide vertically when it lays it out,
+but a puzzle loads later and changes height on Check. The deck must call `deck.layout()` when a
+puzzle resizes (a `ResizeObserver` on every `parsons-puzzle`, see `site/static/demos/reveal/`).
+At the default slide size (960×700) a line puzzle of about 6 lines plus its review fits; longer
+puzzles need a larger Reveal `height`.
+
 Not fixed (cosmetic): the drag copy keeps its unscaled size while dragging. Space/arrows during a
 keyboard drag and Enter did not reach Reveal. Automated drag tests need paced moves (one per frame)
 and a short pause before release, because the library checks the pointer on a timer.

@@ -57,6 +57,7 @@ Order follows dependencies. Each task is one short branch and one or more atomic
 - Done when: a plain HTML page with one script tag shows and scores both variants.
 
 **T7c. Reveal demo deck**
+- Done: `site/static/demos/reveal/` (plain HTML, Reveal 6.0.2 from jsDelivr). Verified locally in Chrome; on Pages after T11.
 - In the site, using the published embed; includes check, reveal-solution as a fragment, reset.
 - Done when: the deck works on Pages with mouse, keyboard and touch.
 
