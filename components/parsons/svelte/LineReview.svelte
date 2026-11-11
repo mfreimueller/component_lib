@@ -38,13 +38,15 @@
     labels?: Partial<LineReviewLabels>;
   }
   let { submission, solution, redHerrings = [], showSolution = true, labels = {} }: Props = $props();
+  // The component's own width (not the window's): right inside scaled hosts such as Reveal.js slides.
+  let width = $state(0);
   const t = $derived({ ...lineReviewLabelsEn, ...labels });
   const uid = $props.id();
   const right = $derived(submission.filter((l) => l.correct).length);
   const tone = $derived(solution.length > 0 && right === solution.length ? 'ok' : right === 0 ? 'bad' : 'mid');
 </script>
 
-<div class="parsons-review">
+<div class="parsons-review" bind:clientWidth={width} class:narrow={width > 0 && width < 700}>
   <div class="panels" class:single={!showSolution}>
     <div class="panel" role="group" aria-labelledby="{uid}-mine">
       <header>
@@ -92,7 +94,6 @@
 
 <style>
   .parsons-review {
-    container-type: inline-size;
     text-align: start;
     font-size: 14px;
     line-height: 1.4;
@@ -200,6 +201,10 @@
   }
   .parsons-review code {
     min-width: 0;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    color: inherit;
     font: inherit;
     white-space: pre;
     overflow: hidden;
@@ -229,10 +234,8 @@
     overflow: hidden;
     clip: rect(0 0 0 0);
   }
-  @container (max-width: 700px) {
-    .panels {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 12px;
-    }
+  .narrow .panels {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
   }
 </style>

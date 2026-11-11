@@ -11,7 +11,10 @@
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "check": "tsc --noEmit && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
-    "build:embed": "vite build --config components/parsons/embed/vite.config.ts"
+    "build:embed": "vite build --config components/parsons/embed/vite.config.ts",
+    "catalog": "node scripts/build-catalog.ts",
+    "catalog:check": "node scripts/build-catalog.ts --check",
+    "build:skill": "vite build --config components/parsons/skills/vite.config.ts --logLevel warn"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.0",

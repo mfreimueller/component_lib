@@ -38,6 +38,8 @@
     labels?: Partial<TemplateReviewLabels>;
   }
   let { lines, redHerrings = [], showExpected = true, labels = {} }: Props = $props();
+  // The component's own width (not the window's): right inside scaled hosts such as Reveal.js slides.
+  let width = $state(0);
   const t = $derived({ ...templateReviewLabelsEn, ...labels });
 
   // A gap is right when everything in it is right and nothing is missing.
@@ -45,7 +47,7 @@
     seg.submitted.length === seg.expected.length && seg.submitted.every((s) => s.correct);
 </script>
 
-<div class="parsons-template-review">
+<div class="parsons-template-review" bind:clientWidth={width} class:narrow={width > 0 && width < 700}>
   <div class="code" role="group" aria-label={t.code}>
     {#each lines as line, n (n)}
       <div class="line">
@@ -93,7 +95,6 @@
     clip: rect(0 0 0 0);
   }
   .parsons-template-review {
-    container-type: inline-size;
     text-align: start;
     font-size: 14px;
     line-height: 1.4;
@@ -186,12 +187,13 @@
     font-size: 13px;
   }
   .herrings code {
+    padding: 0;
+    background: none;
+    color: inherit;
     font: var(--pz-font-size) var(--pz-font-mono);
   }
-  @container (max-width: 700px) {
-    .code {
-      padding: 12px;
-      font-size: 13px;
-    }
+  .narrow .code {
+    padding: 12px;
+    font-size: 13px;
   }
 </style>

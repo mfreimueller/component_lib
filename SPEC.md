@@ -285,7 +285,7 @@ decks that mount the components directly.
 | Alt+Arrow (indent, reorder) also changed the slide | Reveal listens on `document` and ignores `preventDefault` | `stopPropagation()` on every key a component handles |
 | A swipe starting on a piece changed the slide | Reveal touch navigation | `data-prevent-swipe` on the puzzle root |
 | Centred code, uppercase headings, list margins | Reveal theme styles (`.reveal h2`, `.reveal ol`, …) | Bare element rules nested under the root class, with resets; `text-align: start` |
-| Layout switched at the wrong size | Media queries use the window, not the slide | Container queries (`container-type: inline-size` on the root) |
+| Layout switched at the wrong size | Media queries use the window, not the slide | A `narrow` class from the component's own width (`bind:clientWidth`). Container queries were tried first but `container-type: inline-size` collapsed the component to almost zero width in hosts that size it by its content (flex-centred pages, found with a fresh Vite app) |
 | Puzzle dark on a light deck | Tokens follow the OS colour scheme | Deck sets `data-theme="light"` on `<html>` (embed: a `theme` attribute) |
 
 Found while building the demo deck (T7c): Reveal centres a slide vertically when it lays it out,

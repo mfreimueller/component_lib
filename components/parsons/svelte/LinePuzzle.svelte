@@ -50,6 +50,8 @@
     onchange?: (placed: PlacedLine[]) => void;
   }
   let { pieces, placed = [], studentsIndent = false, disabled = false, labels = {}, onchange }: Props = $props();
+  // The component's own width (not the window's): right inside scaled hosts such as Reveal.js slides.
+  let width = $state(0);
   const t = $derived({ ...lineLabelsEn, ...labels });
 
   // Unique per instance: element ids, and the drag type so pieces cannot move between two puzzles.
@@ -182,7 +184,7 @@
 {/snippet}
 
 <!-- data-prevent-swipe: Reveal.js must not change slides when a swipe starts on the puzzle. -->
-<div class="parsons" data-prevent-swipe>
+<div class="parsons" data-prevent-swipe bind:clientWidth={width} class:narrow={width > 0 && width < 700}>
   <p class="sr" id="{uid}-help">{t.help}</p>
 
   <div class="columns">
@@ -258,7 +260,6 @@
     clip: rect(0 0 0 0);
   }
   .parsons {
-    container-type: inline-size;
     text-align: start;
     font-size: 14px;
     line-height: 1.4;
@@ -387,13 +388,11 @@
     opacity: 0.35;
     cursor: not-allowed;
   }
-  @container (max-width: 700px) {
-    .columns {
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    .zone {
-      min-height: 120px;
-    }
+  .narrow .columns {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .narrow .zone {
+    min-height: 120px;
   }
 </style>

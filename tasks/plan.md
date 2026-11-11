@@ -69,6 +69,10 @@ Order follows dependencies. Each task is one short branch and one or more atomic
 - `component.json`, `CHANGELOG.md` (1.0.0), `AGENTS.md`, `scripts/build-catalog.ts` → `catalog.json`, `llms.txt`.
 - Done when: a fresh agent session in an empty Svelte project, given only the one-line prompt,
   installs the line variant and it runs. (Manual check.)
+- Done: checked by following COMPONENT.md §5 in a fresh Vite + Svelte + TS app (type-check, build,
+  runs, skill validator works standalone). Found and fixed: cli.ts must not be copied into a browser
+  app (skill now ships a bundled validate.mjs); container queries collapsed the layout in
+  content-sized hosts (now bind:clientWidth); host `code` styles leaked into reviews.
 
 ## Phase 5: Site
 

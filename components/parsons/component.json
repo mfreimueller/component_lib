@@ -1,0 +1,88 @@
+{
+  "name": "parsons",
+  "version": "1.0.0",
+  "title": "Parsons puzzle",
+  "summary": "Put given code pieces in the right order, or drop them into the gaps of fixed code. Drag, tap or keyboard; exact, shared scoring.",
+  "status": "stable",
+  "tags": [
+    "education",
+    "drag-and-drop",
+    "code",
+    "quiz",
+    "reveal.js"
+  ],
+  "variants": [
+    {
+      "id": "lines",
+      "summary": "Order whole lines; optional indentation by the solver; red herring lines."
+    },
+    {
+      "id": "template",
+      "summary": "Fixed code with gaps; drop pieces in, ordered or any order; decoy gaps; reusable pieces."
+    }
+  ],
+  "docs": {
+    "contract": "COMPONENT.md",
+    "porting": "PORTING.md",
+    "changelog": "CHANGELOG.md"
+  },
+  "files": {
+    "core": [
+      "core/types.ts",
+      "core/score.ts",
+      "core/shuffle.ts",
+      "core/template.ts",
+      "core/board.ts",
+      "core/lines.ts",
+      "core/validate.ts",
+      "core/index.ts"
+    ],
+    "svelte": [
+      "svelte/LinePuzzle.svelte",
+      "svelte/LineReview.svelte",
+      "svelte/TemplatePuzzle.svelte",
+      "svelte/TemplateReview.svelte",
+      "svelte/theme.css"
+    ],
+    "embed": [
+      "embed/ParsonsPuzzle.svelte",
+      "embed/theme.ts",
+      "embed/index.ts",
+      "embed/vite.config.ts"
+    ],
+    "tools": [
+      "core/cli.ts"
+    ],
+    "skills": [
+      "skills/create-puzzle-json/SKILL.md",
+      "skills/create-puzzle-json/example.json",
+      "skills/create-puzzle-json/validate.mjs"
+    ]
+  },
+  "embed": {
+    "tag": "parsons-puzzle",
+    "url": "https://mfreimueller.github.io/component_lib/embed/parsons.js"
+  },
+  "dependencies": {
+    "svelte": "^5",
+    "svelte-dnd-action": "^0.9"
+  },
+  "schema": "schema/puzzle.schema.json",
+  "conformance": "conformance/",
+  "skills": [
+    "skills/create-puzzle-json"
+  ],
+  "ports": [
+    "ports/java.md"
+  ],
+  "examples": [
+    "examples/mixed.json",
+    "examples/PracticeLines.svelte"
+  ],
+  "demos": [
+    "site/static/demos/reveal/index.html"
+  ],
+  "usedIn": [
+    "ParsonXam"
+  ]
+}

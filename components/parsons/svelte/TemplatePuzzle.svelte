@@ -57,6 +57,8 @@
     onchange?: (gaps: GapState) => void;
   }
   let { lines, pieces, placed = {}, disabled = false, labels = {}, onchange }: Props = $props();
+  // The component's own width (not the window's): right inside scaled hosts such as Reveal.js slides.
+  let width = $state(0);
   const t = $derived({ ...templateLabelsEn, ...labels });
 
   // Unique per instance: element ids, and the drag type so chips cannot move between two puzzles.
@@ -126,7 +128,7 @@
 </script>
 
 <!-- data-prevent-swipe: Reveal.js must not change slides when a swipe starts on the puzzle. -->
-<div class="parsons-template" class:locked={disabled} data-prevent-swipe>
+<div class="parsons-template" class:locked={disabled} data-prevent-swipe bind:clientWidth={width} class:narrow={width > 0 && width < 700}>
   <p class="sr" id="{uid}-help">{t.help}</p>
 
   <div class="code" role="group" aria-label={t.code} aria-describedby="{uid}-help">
@@ -202,7 +204,6 @@
     clip: rect(0 0 0 0);
   }
   .parsons-template {
-    container-type: inline-size;
     text-align: start;
     font-size: 14px;
     line-height: 1.4;
@@ -320,14 +321,12 @@
     padding: 2px;
     border-radius: 10px;
   }
-  @container (max-width: 700px) {
-    .code {
-      padding: 12px;
-      font-size: 13px;
-    }
-    .chip,
-    .gap {
-      min-height: 44px;
-    }
+  .narrow .code {
+    padding: 12px;
+    font-size: 13px;
+  }
+  .narrow .chip,
+  .narrow .gap {
+    min-height: 44px;
   }
 </style>

@@ -1,0 +1,43 @@
+{
+  "repo": "https://github.com/mfreimueller/component_lib",
+  "site": "https://mfreimueller.github.io/component_lib/",
+  "howToUse": "Read AGENTS.md, then the component contract (COMPONENT.md). Copy files into the project; do not install a package.",
+  "components": [
+    {
+      "name": "parsons",
+      "version": "1.0.0",
+      "title": "Parsons puzzle",
+      "summary": "Put given code pieces in the right order, or drop them into the gaps of fixed code. Drag, tap or keyboard; exact, shared scoring.",
+      "status": "stable",
+      "tags": [
+        "education",
+        "drag-and-drop",
+        "code",
+        "quiz",
+        "reveal.js"
+      ],
+      "variants": [
+        {
+          "id": "lines",
+          "summary": "Order whole lines; optional indentation by the solver; red herring lines."
+        },
+        {
+          "id": "template",
+          "summary": "Fixed code with gaps; drop pieces in, ordered or any order; decoy gaps; reusable pieces."
+        }
+      ],
+      "path": "components/parsons/",
+      "contract": "components/parsons/COMPONENT.md",
+      "contractUrl": "https://raw.githubusercontent.com/mfreimueller/component_lib/main/components/parsons/COMPONENT.md",
+      "porting": "components/parsons/PORTING.md",
+      "embed": {
+        "tag": "parsons-puzzle",
+        "url": "https://mfreimueller.github.io/component_lib/embed/parsons.js"
+      },
+      "skills": [
+        "components/parsons/skills/create-puzzle-json"
+      ],
+      "page": "https://mfreimueller.github.io/component_lib/components/parsons/"
+    }
+  ]
+}

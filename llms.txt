@@ -1,0 +1,18 @@
+# component_lib
+
+> Reusable components to copy into projects (not a package). Each has a contract for agents
+> (COMPONENT.md: when to use, data format, rules, install, API, pitfalls), tested TypeScript core,
+> Svelte 5 UI, language-neutral conformance cases and a porting guide.
+
+Start with [AGENTS.md](https://raw.githubusercontent.com/mfreimueller/component_lib/main/AGENTS.md). Machine-readable index: [catalog.json](https://raw.githubusercontent.com/mfreimueller/component_lib/main/catalog.json).
+
+## Components
+
+- [Parsons puzzle (parsons@1.0.0)](https://raw.githubusercontent.com/mfreimueller/component_lib/main/components/parsons/COMPONENT.md): Put given code pieces in the right order, or drop them into the gaps of fixed code. Drag, tap or keyboard; exact, shared scoring.
+  - [Porting guide](https://raw.githubusercontent.com/mfreimueller/component_lib/main/components/parsons/PORTING.md)
+  - Embed without a build: `<script type="module" src="https://mfreimueller.github.io/component_lib/embed/parsons.js"></script>`, tag `<parsons-puzzle>`
+
+## Optional
+
+- [Human showcase](https://mfreimueller.github.io/component_lib/)
+- [Spec of this repo](https://raw.githubusercontent.com/mfreimueller/component_lib/main/SPEC.md)
