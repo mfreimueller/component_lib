@@ -8,7 +8,8 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings"
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
+    "sync": "svelte-kit sync"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^4.0.1",
