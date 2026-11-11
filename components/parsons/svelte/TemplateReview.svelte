@@ -33,9 +33,11 @@
   interface Props {
     lines: ReviewSegment[][];
     redHerrings?: string[];
+    /** false: only mark what was placed, do not show what was expected (and hide the red herrings). */
+    showExpected?: boolean;
     labels?: Partial<TemplateReviewLabels>;
   }
-  let { lines, redHerrings = [], labels = {} }: Props = $props();
+  let { lines, redHerrings = [], showExpected = true, labels = {} }: Props = $props();
   const t = $derived({ ...templateReviewLabelsEn, ...labels });
 
   // A gap is right when everything in it is right and nothing is missing.
@@ -60,7 +62,7 @@
                   <span class="none">{t.nothing}</span>
                 {/each}
               </span>
-              {#if !right(seg)}
+              {#if !right(seg) && showExpected}
                 <span class="expected">
                   <span class="label">{t.expected}{seg.anyOrder ? ` ${t.anyOrder}` : ''}</span>
                   {#each seg.expected as e, i (i)}<span class="chip want">{e}</span>{:else}<span class="none">{t.leaveEmpty}</span>{/each}
@@ -74,7 +76,7 @@
     {/each}
   </div>
 
-  {#if redHerrings.length > 0}
+  {#if showExpected && redHerrings.length > 0}
     <p class="herrings">
       {t.herrings}
       {#each redHerrings as h, i (i)}<code>{h}</code>{i < redHerrings.length - 1 ? ', ' : ''}{/each}

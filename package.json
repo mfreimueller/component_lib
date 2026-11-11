@@ -10,7 +10,8 @@
   "scripts": {
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
-    "check": "tsc --noEmit && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings"
+    "check": "tsc --noEmit && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
+    "build:embed": "vite build --config components/parsons/embed/vite.config.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.0",

@@ -1,6 +1,7 @@
-/* parsons component: design tokens. Import once (e.g. in the app's global CSS) and override any
-   token, for example `--pz-primary: var(--brand);`. Every component reads only these. */
-:root {
+/* parsons component: design tokens. Import once (e.g. in the app's global CSS). Every component reads
+   only these. The selectors use :where(), so they have no specificity and any rule of the app wins,
+   e.g. `:root { --pz-primary: var(--brand); }`. Force a scheme with data-theme="light|dark" on <html>. */
+:where(:root) {
   --pz-bg: #f6f6f3;
   --pz-surface: #ffffff;
   --pz-border: #e2e2db;
@@ -24,7 +25,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
+  :where(:root:not([data-theme='light'])) {
     --pz-bg: #121317;
     --pz-surface: #1b1d23;
     --pz-border: #2c2f37;
@@ -43,7 +44,7 @@
   }
 }
 
-:root[data-theme='dark'] {
+:where(:root[data-theme='dark']) {
   --pz-bg: #121317;
   --pz-surface: #1b1d23;
   --pz-border: #2c2f37;
