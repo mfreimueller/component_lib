@@ -36,7 +36,6 @@ Order follows dependencies. Each task is one short branch and one or more atomic
 
 **T6. LinePuzzle + LineReview (Svelte 5)**
 - From ParsonXam `Puzzle.svelte`; controlled props, `theme.css` with custom properties.
-- Add `--fail-on-warnings` back to `npm run check` (removed in T1: it fails while no .svelte files exist).
 - Done when: `svelte-check` clean; works with mouse, touch, keyboard in the site demo (T9).
 
 **T7. TemplatePuzzle + TemplateReview**

@@ -4,3 +4,4 @@ export * from './shuffle.ts';
 export * from './template.ts';
 export * from './board.ts';
 export * from './validate.ts';
+export * from './lines.ts';

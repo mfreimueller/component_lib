@@ -1,0 +1,62 @@
+/* parsons component: design tokens. Import once (e.g. in the app's global CSS) and override any
+   token, for example `--pz-primary: var(--brand);`. Every component reads only these. */
+:root {
+  --pz-bg: #f6f6f3;
+  --pz-surface: #ffffff;
+  --pz-border: #e2e2db;
+  --pz-border-strong: #c9c9bf;
+  --pz-text: #1a1b1e;
+  --pz-text-muted: #6b6d75;
+  --pz-grip: #9a9ca5;
+  --pz-primary: #3d5afe;
+  --pz-primary-soft: #e8ecff;
+  --pz-success: #1f8a4c;
+  --pz-success-soft: #e3f4ea;
+  --pz-danger: #d13b3b;
+  --pz-danger-soft: #fbe6e6;
+  --pz-warn: #b7791f;
+  --pz-warn-soft: #fff1d6;
+  --pz-font-mono: ui-monospace, 'JetBrains Mono', SFMono-Regular, Menlo, monospace;
+  --pz-font-size: 13px;
+  --pz-indent: 24px;
+  --pz-radius: 8px;
+  --pz-radius-lg: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --pz-bg: #121317;
+    --pz-surface: #1b1d23;
+    --pz-border: #2c2f37;
+    --pz-border-strong: #3d414b;
+    --pz-text: #e9eaee;
+    --pz-text-muted: #9a9eab;
+    --pz-grip: #6b7080;
+    --pz-primary: #7d8fff;
+    --pz-primary-soft: #23284a;
+    --pz-success: #4cc27f;
+    --pz-success-soft: #173323;
+    --pz-danger: #f07171;
+    --pz-danger-soft: #3a1c1e;
+    --pz-warn: #e0a84a;
+    --pz-warn-soft: #3a2c14;
+  }
+}
+
+:root[data-theme='dark'] {
+  --pz-bg: #121317;
+  --pz-surface: #1b1d23;
+  --pz-border: #2c2f37;
+  --pz-border-strong: #3d414b;
+  --pz-text: #e9eaee;
+  --pz-text-muted: #9a9eab;
+  --pz-grip: #6b7080;
+  --pz-primary: #7d8fff;
+  --pz-primary-soft: #23284a;
+  --pz-success: #4cc27f;
+  --pz-success-soft: #173323;
+  --pz-danger: #f07171;
+  --pz-danger-soft: #3a1c1e;
+  --pz-warn: #e0a84a;
+  --pz-warn-soft: #3a2c14;
+}
