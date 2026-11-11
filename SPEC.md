@@ -211,7 +211,8 @@ Limits are exported as `LIMITS` so a project can change them in one place.
 
 - **Lines**: share of solution slots holding a line with the same code and indent, 0–100.
   Lines are compared by content, so identical lines are interchangeable. Extra pieces past the
-  end are ignored. Indent is ignored when the puzzle does not ask the student to indent.
+  end are ignored. When the student does not set indentation, each piece carries its solution
+  indent, so the same comparison applies.
 - **Template**: per gap, matching pieces (ordered: LCS; any-order: multiset intersection) over
   `max(expected, placed)`; the puzzle is the sum over all gaps. Empty puzzle → 0.
 - **Rounding**: keep unrounded values, round to 2 decimals once when showing or storing.
