@@ -20,6 +20,8 @@
       showSolutionButton: { type: 'Boolean', attribute: 'reveal-solution' },
       showReset: { type: 'Boolean', attribute: 'reset' },
       studentsIndent: { type: 'Boolean', attribute: 'students-indent' },
+      scoring: { type: 'String' },
+      numbered: { type: 'Boolean' },
       theme: { type: 'String', reflect: true },
       labels: { type: 'Object' },
     },
@@ -84,6 +86,9 @@
     showSolutionButton?: boolean;
     showReset?: boolean;
     studentsIndent?: boolean;
+    /** Line puzzles: 'position' (default) or 'lcs'. */
+    scoring?: string;
+    numbered?: boolean;
     theme?: string;
     labels?: Labels;
   }
@@ -95,6 +100,8 @@
     showSolutionButton = false,
     showReset = false,
     studentsIndent = false,
+    scoring,
+    numbered = false,
     theme,
     labels = {},
   }: Props = $props();
@@ -146,7 +153,7 @@
   const outcome = $derived.by((): LineOutcome | TemplateOutcome | undefined => {
     if (!puzzle || phase === 'solving') return undefined;
     if (isTemplate(puzzle)) return evaluateTemplate(puzzle.template, templateData!.textOf, placedGaps);
-    return evaluateLines(puzzle.solution, lineSetup!.lineOf, placedLines);
+    return evaluateLines(puzzle.solution, lineSetup!.lineOf, placedLines, scoring === 'lcs' ? 'lcs' : 'position');
   });
 
   function emit(type: string, detail: unknown) {
@@ -201,6 +208,7 @@
             pieces={lineSetup.pieces}
             placed={placedLines}
             {studentsIndent}
+            {numbered}
             labels={labels.line}
             onchange={(p) => {
               placedLines = p;
@@ -228,6 +236,7 @@
           solution={puzzle.solution}
           redHerrings={puzzle.redHerrings}
           showSolution={phase === 'solution'}
+          {numbered}
           labels={labels.lineReview}
         />
       {:else if 'lines' in outcome && isTemplate(puzzle)}

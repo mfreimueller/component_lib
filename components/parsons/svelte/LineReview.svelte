@@ -35,9 +35,11 @@
     solution: Line[];
     redHerrings?: Line[];
     showSolution?: boolean;
+    /** Show line numbers. */
+    numbered?: boolean;
     labels?: Partial<LineReviewLabels>;
   }
-  let { submission, solution, redHerrings = [], showSolution = true, labels = {} }: Props = $props();
+  let { submission, solution, redHerrings = [], showSolution = true, numbered = false, labels = {} }: Props = $props();
   // The component's own width (not the window's): right inside scaled hosts such as Reveal.js slides.
   let width = $state(0);
   const t = $derived({ ...lineReviewLabelsEn, ...labels });
@@ -59,6 +61,7 @@
         <ol>
           {#each submission as line, i (i)}
             <li class:right={line.correct} class:wrong={!line.correct}>
+            {#if numbered}<span class="num" aria-hidden="true">{i + 1}</span>{/if}
               <code style:padding-left="calc(var(--pz-indent) * {line.indent})">{line.code}</code>
               <span class="sr">{line.correct ? t.right : t.wrong}</span>
               <span aria-hidden="true" class="mark">{line.correct ? '✓' : '✕'}</span>
@@ -76,7 +79,7 @@
         </header>
         <ol>
           {#each solution as line, i (i)}
-            <li><code style:padding-left="calc(var(--pz-indent) * {line.indent})">{line.code}</code></li>
+            <li>{#if numbered}<span class="num" aria-hidden="true">{i + 1}</span>{/if}<code style:padding-left="calc(var(--pz-indent) * {line.indent})">{line.code}</code></li>
           {/each}
         </ol>
         {#if redHerrings.length > 0}
@@ -200,6 +203,7 @@
     background: var(--pz-warn-soft);
   }
   .parsons-review code {
+    flex: 1;
     min-width: 0;
     padding: 0;
     border-radius: 0;
@@ -209,6 +213,13 @@
     white-space: pre;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .num {
+    flex: none;
+    min-width: 1.6em;
+    color: var(--pz-text-muted);
+    font-size: 11px;
+    text-align: right;
   }
   .mark {
     font-weight: 700;

@@ -48,6 +48,17 @@ linePercent(solution, placed):
   return count(true in lineFlags(solution, placed)) / len(solution) * 100     // unrounded
 ```
 
+The above is the `position` rule (default). The `lcs` rule treats the line puzzle like one ordered
+template gap, with `key(line) = str(line.indent) + ":" + line.code`:
+
+```
+lineFlags(solution, placed, "lcs") = correctFlags({ expected: map key over solution, anyOrder: false },
+                                                  map key over placed)                 // §2.2
+linePercent(solution, placed, "lcs"):
+  if len(solution) == 0: return 0
+  return count(true in lineFlags(...)) / max(len(solution), len(placed)) * 100
+```
+
 ### 2.2 Template scoring
 
 ```
@@ -201,10 +212,10 @@ shuffling, or random ids on a server).
 ### 2.7 Evaluation (review data)
 
 ```
-evaluateLines(solution, lineOf: id -> Line, placed: PlacedLine[]):
+evaluateLines(solution, lineOf: id -> Line, placed: PlacedLine[], scoring = "position"):
   lines = [ { code: lineOf[p.pieceId].code, indent: p.indent } for p in placed if p.pieceId in lineOf ]
-  return { percent: linePercent(solution, lines),
-           submission: lines with correct = lineFlags(solution, lines)[i] }
+  return { percent: linePercent(solution, lines, scoring),
+           submission: lines with correct = lineFlags(solution, lines, scoring)[i] }
 
 evaluateTemplate(template, textOf: id -> text, gaps: GapState):
   parsed = parseTemplate(template)
@@ -230,8 +241,8 @@ evaluateTemplate(template, textOf: id -> text, gaps: GapState):
 1. **Two areas** per line puzzle (pool, solution) or a code view with gaps plus a pool (template).
 2. **Three ways to move a piece**: drag and drop (mouse and touch), tap/click (pool → end of the
    solution or into the *selected* gap; placed → back to the pool), keyboard (focusable pieces;
-   Enter moves between areas; a key to pick up and arrow keys to move; Alt+←/→ indents a placed line
-   or reorders a piece inside its gap).
+   Enter moves between areas; a key to pick up and arrow keys to move; Alt+↑/↓ moves a placed line
+   and keeps focus on it; Alt+←/→ indents a placed line or reorders a piece inside its gap).
 3. **Indentation controls** on placed lines when the solver sets indentation (0–6), and the indent
    is shown as visual offset.
 4. **Reusable pieces** stay in the pool; every placed copy is its own item with its own id.

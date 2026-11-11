@@ -1,6 +1,6 @@
 {
   "function": "linePercent",
-  "description": "Line puzzles. flags: per placed line, right line in that slot. percentRounded: round2(linePercent).",
+  "description": "Line puzzles. input.scoring: \"position\" (default when missing) or \"lcs\". flags: per placed line, right or not. percentRounded: round2(linePercent).",
   "cases": [
     {
       "name": "exact solution",
@@ -402,6 +402,469 @@
       "expected": {
         "flags": [],
         "percentRounded": 0
+      }
+    },
+    {
+      "name": "lcs: exact solution",
+      "input": {
+        "solution": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "placed": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "scoring": "lcs"
+      },
+      "expected": {
+        "flags": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "percentRounded": 100
+      }
+    },
+    {
+      "name": "lcs: one swapped pair loses one line",
+      "input": {
+        "solution": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "placed": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "scoring": "lcs"
+      },
+      "expected": {
+        "flags": [
+          true,
+          true,
+          false,
+          true
+        ],
+        "percentRounded": 75
+      }
+    },
+    {
+      "name": "lcs: a missing early line costs only that line",
+      "input": {
+        "solution": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "placed": [
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "scoring": "lcs"
+      },
+      "expected": {
+        "flags": [
+          true,
+          true,
+          true
+        ],
+        "percentRounded": 75
+      }
+    },
+    {
+      "name": "lcs: red herring is wrong",
+      "input": {
+        "solution": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "placed": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(n)",
+            "indent": 1
+          }
+        ],
+        "scoring": "lcs"
+      },
+      "expected": {
+        "flags": [
+          true,
+          true,
+          true,
+          false
+        ],
+        "percentRounded": 75
+      }
+    },
+    {
+      "name": "lcs: wrong indentation is wrong",
+      "input": {
+        "solution": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "placed": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 0
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "scoring": "lcs"
+      },
+      "expected": {
+        "flags": [
+          true,
+          true,
+          false,
+          true
+        ],
+        "percentRounded": 75
+      }
+    },
+    {
+      "name": "lcs: nothing placed",
+      "input": {
+        "solution": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "placed": [],
+        "scoring": "lcs"
+      },
+      "expected": {
+        "flags": [],
+        "percentRounded": 0
+      }
+    },
+    {
+      "name": "lcs: extra lines lower the score",
+      "input": {
+        "solution": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "placed": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          },
+          {
+            "code": "extra",
+            "indent": 0
+          }
+        ],
+        "scoring": "lcs"
+      },
+      "expected": {
+        "flags": [
+          true,
+          true,
+          true,
+          true,
+          false
+        ],
+        "percentRounded": 80
+      }
+    },
+    {
+      "name": "lcs: identical lines are interchangeable",
+      "input": {
+        "solution": [
+          {
+            "code": "pass",
+            "indent": 1
+          },
+          {
+            "code": "pass",
+            "indent": 1
+          }
+        ],
+        "placed": [
+          {
+            "code": "pass",
+            "indent": 1
+          },
+          {
+            "code": "pass",
+            "indent": 1
+          }
+        ],
+        "scoring": "lcs"
+      },
+      "expected": {
+        "flags": [
+          true,
+          true
+        ],
+        "percentRounded": 100
+      }
+    },
+    {
+      "name": "lcs: one of three",
+      "input": {
+        "solution": [
+          {
+            "code": "a",
+            "indent": 0
+          },
+          {
+            "code": "b",
+            "indent": 0
+          },
+          {
+            "code": "c",
+            "indent": 0
+          }
+        ],
+        "placed": [
+          {
+            "code": "a",
+            "indent": 0
+          }
+        ],
+        "scoring": "lcs"
+      },
+      "expected": {
+        "flags": [
+          true
+        ],
+        "percentRounded": 33.33
+      }
+    },
+    {
+      "name": "lcs: empty solution",
+      "input": {
+        "solution": [],
+        "placed": [],
+        "scoring": "lcs"
+      },
+      "expected": {
+        "flags": [],
+        "percentRounded": 0
+      }
+    },
+    {
+      "name": "lcs: reversed keeps the earliest match",
+      "input": {
+        "solution": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "placed": [
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "n = 5",
+            "indent": 0
+          }
+        ],
+        "scoring": "lcs"
+      },
+      "expected": {
+        "flags": [
+          true,
+          false,
+          false,
+          false
+        ],
+        "percentRounded": 25
       }
     }
   ]

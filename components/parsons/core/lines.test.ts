@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { evaluateLines, linePieces } from './lines.ts';
+import { evaluateLines, linePieces, linesFromText, linesToText } from './lines.ts';
 import type { LinePuzzle } from './types.ts';
 
 const puzzle: LinePuzzle = {
@@ -44,5 +44,38 @@ describe('evaluateLines', () => {
 
   it('skips unknown ids', () => {
     expect(evaluateLines(puzzle.solution, lineOf, [{ pieceId: 'nope', indent: 0 }]).submission).toEqual([]);
+  });
+});
+
+describe('lcs scoring in evaluateLines', () => {
+  it('costs only the missing line', () => {
+    const { lineOf } = linePieces(puzzle, 7, true);
+    const idOf = (code: string) => [...lineOf].find(([, l]) => l.code === code)![0];
+    const placed = [{ pieceId: idOf('print(i)'), indent: 1 }];
+    expect(evaluateLines(puzzle.solution, lineOf, placed).percent).toBe(0);
+    expect(evaluateLines(puzzle.solution, lineOf, placed, 'lcs').percent).toBe(50);
+  });
+});
+
+describe('linesFromText / linesToText', () => {
+  it('turns leading spaces and tabs into indent levels and back', () => {
+    const lines = linesFromText(['for i in range(3):', '    print(i)', '\tif i:', '\t    pass  ']);
+    expect(lines).toEqual([
+      { code: 'for i in range(3):', indent: 0 },
+      { code: 'print(i)', indent: 1 },
+      { code: 'if i:', indent: 1 },
+      { code: 'pass', indent: 2 },
+    ]);
+    expect(linesToText(lines)).toEqual(['for i in range(3):', '    print(i)', '    if i:', '        pass']);
+  });
+
+  it('supports another indent width', () => {
+    expect(linesFromText(['  x'], 2)).toEqual([{ code: 'x', indent: 1 }]);
+    expect(linesToText([{ code: 'x', indent: 2 }], 2)).toEqual(['    x']);
+  });
+
+  it('rejects indentation that is not a whole level or too deep', () => {
+    expect(() => linesFromText(['ok', '  half'])).toThrow(/line 2/);
+    expect(() => linesFromText([' '.repeat(28) + 'deep'])).toThrow(/6/);
   });
 });

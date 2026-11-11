@@ -17,7 +17,7 @@ Compare `expected` by deep equality (object key order does not matter, array ord
 
 | File | Function | Input | Expected |
 |---|---|---|---|
-| `score-lines.json` | `linePercent` | `solution`, `placed` (lines) | `flags` (per placed line), `percentRounded` |
+| `score-lines.json` | `linePercent` | `solution`, `placed` (lines), `scoring` (`position` if missing, or `lcs`) | `flags` (per placed line), `percentRounded` |
 | `score-template.json` | `templatePercent` | `gaps`, `placed` (texts per gap; missing = empty) | `flags` per gap, `percentRounded` |
 | `parse-template.json` | `parseTemplate` | `source` | `lines`, `gaps`, `pieces`, `errorLines: []`; or only `errorLines` (sorted) when there are errors |
 | `pool.json` | `buildPool` | `template`, `redHerrings`, `reusable` | `tiles`, `errorCount: 0`; or only `errorCount` |

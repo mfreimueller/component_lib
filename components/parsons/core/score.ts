@@ -9,21 +9,38 @@ export const mean = (values: number[]): number =>
   values.length === 0 ? 0 : values.reduce((a, b) => a + b, 0) / values.length;
 
 /**
- * Per placed line: is it the right line in that slot? A slot is right when its line has the same
- * code and indent as the solution line at that position. Lines are compared by content, so
- * identical lines (two `pass`, two `}`) are interchangeable. Pieces past the end are false.
+ * How line puzzles are scored.
+ * - `position` (default, ParsonXam): a slot is right when it holds the solution line of that slot.
+ *   A missing early line shifts and fails everything after it. Extra lines past the end are ignored.
+ * - `lcs` (1bhif): the longest common subsequence of placed and solution lines is right. A missing
+ *   early line costs only that line; extra lines lower the score (like template gaps).
  */
-export function lineFlags(solution: Line[], placed: Line[]): boolean[] {
+export type LineScoring = 'position' | 'lcs';
+
+// Lines are equal when code and indent are equal (indent is 0..6, so the key is unambiguous).
+const lineKey = (l: Line) => `${l.indent}:${l.code}`;
+
+/**
+ * Per placed line: is it right? Lines are compared by content (code and indent), so identical lines
+ * (two `pass`, two `}`) are interchangeable. See LineScoring for the two rules.
+ */
+export function lineFlags(solution: Line[], placed: Line[], scoring: LineScoring = 'position'): boolean[] {
+  if (scoring === 'lcs') return correctFlags({ expected: solution.map(lineKey), anyOrder: false }, placed.map(lineKey));
   return placed.map((got, i) => {
     const want = solution[i];
     return want !== undefined && got.code === want.code && got.indent === want.indent;
   });
 }
 
-/** Share of solution slots holding the right line. Red herrings fail their slot; extras are ignored. */
-export function linePercent(solution: Line[], placed: Line[]): number {
+/**
+ * Line puzzle score, 0..100. `position`: right slots / solution lines. `lcs`: matching lines /
+ * max(solution lines, placed lines). An empty solution scores 0.
+ */
+export function linePercent(solution: Line[], placed: Line[], scoring: LineScoring = 'position'): number {
   if (solution.length === 0) return 0;
-  return (lineFlags(solution, placed).filter(Boolean).length / solution.length) * 100;
+  const right = lineFlags(solution, placed, scoring).filter(Boolean).length;
+  const denom = scoring === 'lcs' ? Math.max(solution.length, placed.length) : solution.length;
+  return (right / denom) * 100;
 }
 
 /**

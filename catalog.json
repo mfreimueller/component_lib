@@ -5,7 +5,7 @@
   "components": [
     {
       "name": "parsons",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "title": "Parsons puzzle",
       "summary": "Put given code pieces in the right order, or drop them into the gaps of fixed code. Drag, tap or keyboard; exact, shared scoring.",
       "status": "stable",

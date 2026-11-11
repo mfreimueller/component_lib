@@ -19,9 +19,9 @@ interface CaseFile {
 const dir = new URL('../conformance/', import.meta.url);
 
 const run: Record<string, (input: any) => unknown> = {
-  linePercent: ({ solution, placed }) => ({
-    flags: core.lineFlags(solution, placed),
-    percentRounded: core.round2(core.linePercent(solution, placed)),
+  linePercent: ({ solution, placed, scoring = 'position' }) => ({
+    flags: core.lineFlags(solution, placed, scoring),
+    percentRounded: core.round2(core.linePercent(solution, placed, scoring)),
   }),
   templatePercent: ({ gaps, placed }) => ({
     flags: gaps.map((g: core.TemplateGap, i: number) => core.correctFlags(g, placed[i] ?? [])),

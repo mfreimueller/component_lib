@@ -1,6 +1,6 @@
 # parsons: Parsons puzzles
 
-Version 1.0.0 · status stable · used in ParsonXam
+Version 1.1.0 · status stable · used in ParsonXam, the 1bhif and 5ehif course sites
 
 The solver gets code pieces and puts them in order (**line** variant) or into the gaps of fixed code
 (**template** variant). Drag and drop, tap, and keyboard all work. Scoring is exact and shared by
@@ -103,9 +103,15 @@ Template syntax:
 
 ## 4. Rules
 
-- **Line score** = share of solution slots holding the right line (same code and same indent), 0–100.
-  Lines are compared by content, so identical lines are interchangeable. A red herring in a slot is
-  wrong. Pieces past the end are ignored. A missing early line shifts and fails everything after it.
+- **Line score**, two rules (chosen by the app, not stored in the puzzle file). Lines are equal when
+  code and indent are equal, so identical lines are interchangeable.
+  - `position` (default, ParsonXam): share of solution slots holding the right line, 0–100. A red
+    herring in a slot is wrong; pieces past the end are ignored; a missing early line shifts and
+    fails everything after it. Strict, good for exams.
+  - `lcs` (1bhif): matching lines of the longest common subsequence / max(solution lines, placed
+    lines). A missing or misplaced line costs only itself; extra lines lower the score. Forgiving,
+    good for practice.
+  A quiz that only knows right/wrong counts a puzzle as right at 100 % (both rules agree there).
 - **Indentation**: with `studentsIndent` the pieces come without indent and the solver sets it
   (part of the answer). Without it, each piece carries its solution indent.
 - **Template score** = Σ matching pieces / Σ max(expected, placed) over all gaps. Matching pieces:
@@ -135,7 +141,7 @@ The conformance cases in `conformance/` are the reference for all of these.
    specificity), e.g. `--pz-primary: var(--brand); --pz-font-mono: 'JetBrains Mono'`. Pin a scheme
    with `data-theme="light"` or `"dark"` on `<html>`.
 5. Put a header comment on every copied file so later updates are traceable:
-   `// from component_lib parsons@1.0.0 (components/parsons/core/score.ts)` (Svelte: `<!-- … -->`).
+   `// from component_lib parsons@1.1.0 (components/parsons/core/score.ts)` (Svelte: `<!-- … -->`).
 6. Optional: copy `skills/create-puzzle-json/` into the project's skills folder (e.g.
    `.claude/skills/`) so agents can write puzzle files. It is self-contained: its `validate.mjs` is
    the core validator bundled into one file.
@@ -147,7 +153,7 @@ The conformance cases in `conformance/` are the reference for all of these.
 ```ts
 // Practice mode: the browser has the whole puzzle.
 const { pieces, lineOf } = linePieces(puzzle, seed, studentsIndent);    // LinePiece[], Map<id, Line>
-const { percent, submission } = evaluateLines(puzzle.solution, lineOf, placed);
+const { percent, submission } = evaluateLines(puzzle.solution, lineOf, placed, 'position' | 'lcs');
 
 const { lines, tiles, textOf } = templateSetup(puzzle, seed);           // segments, Tile[], Map<id, text>
 const { percent, lines: review } = evaluateTemplate(puzzle.template, textOf, gaps);
@@ -156,6 +162,7 @@ validatePuzzleFile(json)   // { ok, problems: [{path, message}], warnings, file?
 linePercent / lineFlags / templatePercent / correctFlags / round2 / mean
 parseTemplate / buildPool / LIMITS / FILE_LIMITS
 shuffled(items, seed) / mixSeed(seed, salt) / randomSeed()
+linesFromText(["for x in xs:", "    print(x)"], 4) / linesToText(lines, 4)   // indented strings <-> Line[]
 ```
 
 Arrangements: lines `PlacedLine[] = [{ pieceId, indent }]` in placed order; templates
@@ -172,8 +179,8 @@ Arrangements: lines `PlacedLine[] = [{ pieceId, indent }]` in placed order; temp
 
 | Component | Props |
 |---|---|
-| `LinePuzzle` | `pieces`, `placed?`, `studentsIndent?`, `disabled?`, `labels?`, `onchange?` |
-| `LineReview` | `submission`, `solution`, `redHerrings?`, `showSolution?` (default true), `labels?` |
+| `LinePuzzle` | `pieces`, `placed?`, `studentsIndent?`, `disabled?`, `numbered?`, `labels?`, `onchange?` |
+| `LineReview` | `submission`, `solution`, `redHerrings?`, `showSolution?` (default true), `numbered?`, `labels?` |
 | `TemplatePuzzle` | `lines`, `pieces`, `placed?`, `disabled?`, `labels?`, `onchange?` |
 | `TemplateReview` | `lines`, `redHerrings?`, `showExpected?` (default true), `labels?` |
 
@@ -221,6 +228,8 @@ Arrangements: lines `PlacedLine[] = [{ pieceId, indent }]` in placed order; temp
 | `src`, `index` | Puzzle file URL (relative to the page) and which puzzle (default 0). Or an inline `<script type="application/json">` child. |
 | `seed` | Fixed shuffle (default random). |
 | `students-indent` | The solver sets indentation. |
+| `scoring` | Line puzzles: `position` (default) or `lcs`. |
+| `numbered` | Line numbers in the solution and review. |
 | `check`, `reveal-solution`, `reset` | Show these buttons. |
 | `theme` | `light` or `dark` (default: page tokens / OS scheme). |
 
@@ -266,7 +275,10 @@ copy of the deck; PDF export shows the unsolved puzzles.
   (`real()`, `isDndShadowItem`) before saving or counting. Chip ids must be unique per chip, not per
   piece, when pieces are reusable.
 - **Keyboard**: Space picks up / drops (keyboard drag), Enter moves between pool and solution,
-  Alt+←/→ indents (lines) or reorders inside a gap (template).
+  Alt+↑/↓ moves a placed line, Alt+←/→ indents a placed line (lines) or reorders inside a gap
+  (template).
+- **Content with the indentation in the text** (1bhif stores `"    total += i"`): convert with
+  `linesFromText` when importing; it rejects indentation that is not a whole level.
 - **Inside Reveal.js** (or any page that styles bare elements or scales content): no `<section>` in
   components, hit-test at the cursor (`useCursorForDetection`), stop propagation of handled keys,
   layout from the component's own width (`bind:clientWidth`), not media or container queries
@@ -286,4 +298,9 @@ copy of the deck; PDF export shows the unsolved puzzles.
 ## 10. Used in
 
 - **ParsonXam**: exams (exam mode, server scoring), the source of this component.
+- **1bhif course site** (`SPG/_teaching/_2627/_course/1bhif`): quiz questions with template puzzles
+  (parser and board from ParsonXam) and its own line puzzles (indented strings, LCS scoring, line
+  numbers, Alt+↑/↓), which became `lcs`, `linesFromText`, `numbered` and Alt+↑/↓ in 1.1.0.
+- **5ehif Lernwerkstatt** (`SPG/_teaching/_2627/_lernwerkstatt/_5ehif/course`): template puzzles in
+  quiz questions, German texts, locked after answering (`disabled`).
 - **Mars Rover**: a different variant (nested blocks with execution) in JavaFX; see `ports/java.md`.

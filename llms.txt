@@ -8,7 +8,7 @@ Start with [AGENTS.md](https://raw.githubusercontent.com/mfreimueller/component_
 
 ## Components
 
-- [Parsons puzzle (parsons@1.0.0)](https://raw.githubusercontent.com/mfreimueller/component_lib/main/components/parsons/COMPONENT.md): Put given code pieces in the right order, or drop them into the gaps of fixed code. Drag, tap or keyboard; exact, shared scoring.
+- [Parsons puzzle (parsons@1.1.0)](https://raw.githubusercontent.com/mfreimueller/component_lib/main/components/parsons/COMPONENT.md): Put given code pieces in the right order, or drop them into the gaps of fixed code. Drag, tap or keyboard; exact, shared scoring.
   - [Porting guide](https://raw.githubusercontent.com/mfreimueller/component_lib/main/components/parsons/PORTING.md)
   - Embed without a build: `<script type="module" src="https://mfreimueller.github.io/component_lib/embed/parsons.js"></script>`, tag `<parsons-puzzle>`
 

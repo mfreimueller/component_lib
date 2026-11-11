@@ -115,3 +115,33 @@ describe('LineReview', () => {
     expect(target.querySelectorAll('li.herring')).toHaveLength(1);
   });
 });
+
+describe('LinePuzzle extras', () => {
+  it('moves a placed line with Alt+Up/Down and keeps focus on it', async () => {
+    const { onchange, codes, piece, target } = setup({ placed: [{ pieceId: 'p0', indent: 1 }, { pieceId: 'p1', indent: 0 }] });
+    piece('solution', 'for i').dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', altKey: true, bubbles: true }));
+    await new Promise((r) => setTimeout(r));
+    flushSync();
+    expect(codes('solution')).toEqual(['for i in range(3):', 'print(i)']);
+    expect(onchange).toHaveBeenLastCalledWith([{ pieceId: 'p1', indent: 0 }, { pieceId: 'p0', indent: 1 }]);
+    expect(document.activeElement?.closest('[data-piece]')?.getAttribute('data-piece')).toBe('p1');
+    piece('solution', 'for i').dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', altKey: true, bubbles: true }));
+    expect(codes('solution')).toEqual(['for i in range(3):', 'print(i)']);
+    expect(target).toBeDefined();
+  });
+
+  it('does not let Alt+arrows reach the page (e.g. Reveal.js)', () => {
+    const { piece } = setup({ placed: [{ pieceId: 'p0', indent: 1 }, { pieceId: 'p1', indent: 0 }] });
+    const reached = vi.fn();
+    document.addEventListener('keydown', reached);
+    piece('solution', 'print').dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', altKey: true, bubbles: true }));
+    document.removeEventListener('keydown', reached);
+    expect(reached).not.toHaveBeenCalled();
+  });
+
+  it('numbers the solution lines when asked', () => {
+    const { target } = setup({ numbered: true, placed: [{ pieceId: 'p0', indent: 1 }, { pieceId: 'p1', indent: 0 }] });
+    expect([...target.querySelectorAll('[data-testid="solution"] .num')].map((n) => n.textContent)).toEqual(['1', '2']);
+    expect(target.querySelectorAll('[data-testid="pool"] .num')).toHaveLength(0);
+  });
+});

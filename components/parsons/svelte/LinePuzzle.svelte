@@ -30,12 +30,13 @@
     dragHandle: 'drag handle',
     help:
       'Drag a piece by its handle, or tap it to move it between the lists. With a keyboard: focus a handle, press Space to ' +
-      'pick a piece up, use the arrow keys to move it, Space to drop it, or Enter to move it to the other list.',
+      'pick a piece up, use the arrow keys to move it, Space to drop it, or Enter to move it to the other list. ' +
+      'In your solution, Alt with the up or down arrow moves a line, Alt with the left or right arrow changes its indentation.',
   };
 </script>
 
 <script lang="ts">
-  import { untrack } from 'svelte';
+  import { tick, untrack } from 'svelte';
   import { flip } from 'svelte/animate';
   import { dragHandle, dragHandleZone, setKeyboardDragTrigger } from 'svelte-dnd-action';
   import type { LinePiece, PlacedLine } from '../core/types.ts';
@@ -46,10 +47,12 @@
     /** true: pieces arrive without indent and the solver indents them. false: each piece carries its indent. */
     studentsIndent?: boolean;
     disabled?: boolean;
+    /** Show line numbers in the solution. */
+    numbered?: boolean;
     labels?: Partial<LinePuzzleLabels>;
     onchange?: (placed: PlacedLine[]) => void;
   }
-  let { pieces, placed = [], studentsIndent = false, disabled = false, labels = {}, onchange }: Props = $props();
+  let { pieces, placed = [], studentsIndent = false, disabled = false, numbered = false, labels = {}, onchange }: Props = $props();
   // The component's own width (not the window's): right inside scaled hosts such as Reveal.js slides.
   let width = $state(0);
   const t = $derived({ ...lineLabelsEn, ...labels });
@@ -132,6 +135,22 @@
     emit();
   }
 
+  let root = $state<HTMLElement>();
+
+  /** Moves a placed line one step up (-1) or down (+1) and keeps keyboard focus on it. */
+  async function move(item: Item, delta: -1 | 1) {
+    const from = solution.findIndex((i) => i.id === item.id);
+    const to = from + delta;
+    if (disabled || from < 0 || to < 0 || to >= solution.length) return;
+    const next = [...solution];
+    [next[from], next[to]] = [next[to]!, next[from]!];
+    solution = next;
+    emit();
+    await tick();
+    const moved = [...(root?.querySelectorAll<HTMLElement>('[data-piece]') ?? [])].find((el) => el.dataset.piece === item.id);
+    moved?.querySelector<HTMLElement>('.grip')?.focus();
+  }
+
   function onKey(e: KeyboardEvent, item: Item, inSolution: boolean) {
     if (disabled || (e.target as HTMLElement).closest('.indent')) return;
     if (e.key === 'Enter') {
@@ -139,6 +158,10 @@
       e.stopPropagation();
       if (inSolution) toPool(item);
       else toSolution(item);
+    } else if (inSolution && e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+      e.preventDefault();
+      e.stopPropagation();
+      move(item, e.key === 'ArrowDown' ? 1 : -1);
     } else if (inSolution && studentsIndent && (e.key === 'ArrowRight' || e.key === 'ArrowLeft') && e.altKey) {
       e.preventDefault();
       e.stopPropagation();
@@ -174,6 +197,7 @@
       </g>
     </svg>
   </span>
+  {#if numbered && inSolution}<span class="num" aria-hidden="true">{position}</span>{/if}
   <span class="code" style:padding-left="calc(var(--pz-indent) * {!studentsIndent || inSolution ? item.indent : 0})">{item.code}</span>
   {#if studentsIndent && inSolution && !disabled}
     <span class="indent">
@@ -184,7 +208,7 @@
 {/snippet}
 
 <!-- data-prevent-swipe: Reveal.js must not change slides when a swipe starts on the puzzle. -->
-<div class="parsons" data-prevent-swipe bind:clientWidth={width} class:narrow={width > 0 && width < 700}>
+<div class="parsons" data-prevent-swipe bind:this={root} bind:clientWidth={width} class:narrow={width > 0 && width < 700}>
   <p class="sr" id="{uid}-help">{t.help}</p>
 
   <div class="columns">
@@ -206,6 +230,7 @@
           <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
           <div
             class="piece"
+            data-piece={item.id}
             class:locked={disabled}
             aria-label={item.code}
             onclick={() => toSolution(item)}
@@ -237,6 +262,7 @@
           <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
           <div
             class="piece"
+            data-piece={item.id}
             class:locked={disabled}
             aria-label={item.code}
             onclick={() => toPool(item)}
@@ -362,6 +388,13 @@
   }
   .grip:active {
     cursor: grabbing;
+  }
+  .num {
+    flex: none;
+    min-width: 1.6em;
+    color: var(--pz-text-muted);
+    font-size: 11px;
+    text-align: right;
   }
   .code {
     flex: 1;
