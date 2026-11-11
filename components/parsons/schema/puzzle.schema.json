@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mfreimueller.github.io/component_lib/schema/parsons/puzzle.schema.json",
+  "title": "Parsons puzzle file",
+  "description": "Structure only. Template syntax, red herrings that equal solution lines and the limits that need parsing are checked by core/validate.ts.",
+  "type": "object",
+  "required": ["puzzles"],
+  "properties": {
+    "puzzles": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "items": { "$ref": "#/$defs/puzzle" }
+    }
+  },
+  "$defs": {
+    "puzzle": {
+      "if": { "required": ["kind"], "properties": { "kind": { "const": "template" } } },
+      "then": { "$ref": "#/$defs/templatePuzzle" },
+      "else": { "$ref": "#/$defs/linePuzzle" }
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 120, "pattern": "\\S" },
+    "description": { "type": "string", "maxLength": 2000, "description": "The task text the solver reads." },
+    "line": {
+      "type": "object",
+      "required": ["code"],
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "maxLength": 200,
+          "pattern": "^[^\\s][^\\r\\n]*$",
+          "description": "One line, no leading spaces or tabs (use indent)."
+        },
+        "indent": { "type": "integer", "minimum": 0, "maximum": 6, "default": 0, "description": "Nesting level, not a number of spaces." }
+      }
+    },
+    "linePuzzle": {
+      "type": "object",
+      "required": ["title", "solution"],
+      "properties": {
+        "kind": { "const": "lines" },
+        "title": { "$ref": "#/$defs/title" },
+        "description": { "$ref": "#/$defs/description" },
+        "solution": { "type": "array", "minItems": 2, "maxItems": 30, "items": { "$ref": "#/$defs/line" }, "description": "Lines in the correct order." },
+        "redHerrings": { "type": "array", "maxItems": 10, "items": { "$ref": "#/$defs/line" }, "description": "Lines that belong nowhere in the solution." }
+      }
+    },
+    "templatePuzzle": {
+      "type": "object",
+      "required": ["kind", "title", "template"],
+      "properties": {
+        "kind": { "const": "template" },
+        "title": { "$ref": "#/$defs/title" },
+        "description": { "$ref": "#/$defs/description" },
+        "template": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 6000,
+          "description": "The correct code with {{piece}} markers; {{~a}} {{b}} any order; {{}} empty gap."
+        },
+        "redHerrings": { "type": "array", "maxItems": 15, "items": { "type": "string", "minLength": 1, "maxLength": 200, "pattern": "\\S" } },
+        "reusable": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Piece texts that may be placed any number of times." }
+      }
+    }
+  }
+}

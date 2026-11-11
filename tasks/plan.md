@@ -28,7 +28,7 @@ Order follows dependencies. Each task is one short branch and one or more atomic
 
 **T5. Validator + schema**
 - `core/validate.ts` with the rules of ParsonXam's `validate.mjs` (errors + warnings), runnable as
-  `node components/parsons/core/validate.ts file.json`. `schema/puzzle.schema.json`.
+  `node components/parsons/core/cli.ts file.json` (validate.ts stays pure for the browser). `schema/puzzle.schema.json`.
 - `conformance/validate.json` with invalid files and expected messages.
 - Done when: ParsonXam's `example.json` validates OK; every invalid case fails as expected.
 

@@ -41,7 +41,7 @@ format, the rules, the pitfalls, tested code and test cases.
 1. The repo is published as `mfreimueller/component_lib`; the site lives at
    `https://mfreimueller.github.io/component_lib/`. The base path comes from config, not code.
 2. Core TS uses only **erasable syntax** (no `enum`, no `namespace`, no parameter properties) and
-   `.ts` import suffixes, so Node 22.18+ can run the core and the validator directly (`node validate.ts`)
+   `.ts` import suffixes, so Node 22.18+ can run the core and the validator directly (`node core/cli.ts file.json`)
    without a build step.
 3. The Svelte UI may depend on `svelte-dnd-action` (as ParsonXam does: touch + keyboard). Each
    component lists its npm dependencies in its manifest.
@@ -80,7 +80,8 @@ components/
       template.ts         parseTemplate, buildPool, normalisePiece, LIMITS
       score.ts            linePercent, templatePercent, correctFlags, round2, mean
       shuffle.ts          seeded shuffle (mulberry32 + Fisher–Yates), seed mixing
-      validate.ts         validates a puzzle file, same rules as the schema plus semantics
+      validate.ts         validates a puzzle file (pure, also runs in the browser)
+      cli.ts              command line wrapper: node core/cli.ts file.json
       board.ts            template board state (pool + gaps), pure functions
       index.ts
       *.test.ts           unit tests + a runner over conformance/*.json
@@ -279,7 +280,7 @@ npm run check           # svelte-check + tsc
 npm run catalog         # regenerate catalog.json and llms.txt
 npm run dev             # site dev server
 npm run build           # static site in site/build
-node components/parsons/core/validate.ts <file.json>   # validate a puzzle file (Node 22.18+)
+node components/parsons/core/cli.ts <file.json>        # validate a puzzle file (Node 22.18+)
 ```
 
 One root `package.json` (npm workspaces: root + `site`). No build for `components/`.

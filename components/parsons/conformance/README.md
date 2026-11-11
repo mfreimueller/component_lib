@@ -24,6 +24,7 @@ Compare `expected` by deep equality (object key order does not matter, array ord
 | `shuffle.json` | `shuffled` | `items`, `seed` | the shuffled items |
 | `mix-seed.json` | `mixSeed` | `seed`, `salt` | unsigned 32-bit integer |
 | `round.json` | `round2` | `round2: x`, or `meanRounded: [values]` | the rounded number |
+| `validate.json` | `validate` | a parsed puzzle file | `ok`, `problemPaths`, `warningPaths` (sorted) |
 
 Error messages are never compared, only where errors are (line numbers) or how many there are, so a
 port may word or translate messages freely.

@@ -1,0 +1,1704 @@
+{
+  "function": "validate",
+  "description": "Validates a puzzle file. input = the parsed JSON. ok: valid or not. problemPaths / warningPaths: dotted paths of all problems / warnings, sorted, duplicates kept (messages are not compared).",
+  "cases": [
+    {
+      "name": "valid: example file with line and template puzzles",
+      "input": {
+        "puzzles": [
+          {
+            "title": "Sum of 1 to N",
+            "description": "Read n and print 1 + 2 + ... + n.",
+            "solution": [
+              {
+                "code": "n = int(input())",
+                "indent": 0
+              },
+              {
+                "code": "total = 0",
+                "indent": 0
+              },
+              {
+                "code": "for i in range(1, n + 1):",
+                "indent": 0
+              },
+              {
+                "code": "total += i",
+                "indent": 1
+              },
+              {
+                "code": "print(total)",
+                "indent": 0
+              }
+            ],
+            "redHerrings": [
+              {
+                "code": "for i in range(n):",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "kind": "template",
+            "title": "Employees above their department average",
+            "description": "Complete the query: list name and salary of every employee who earns more than the average salary of their own department.",
+            "template": "{{SELECT}} {{e.name}}, {{e.salary}}\n{{FROM}} {{employees e}}\n{{WHERE}} {{e.salary > (}}\n    {{SELECT}} {{AVG(x.salary)}}\n    {{FROM}} {{employees x}}\n    {{WHERE}} {{x.dept_id = e.dept_id}}\n{{)}}",
+            "redHerrings": [
+              "GROUP BY",
+              "HAVING"
+            ],
+            "reusable": [
+              "SELECT",
+              "FROM",
+              "WHERE"
+            ]
+          },
+          {
+            "kind": "template",
+            "title": "JPA entity Order",
+            "description": "Complete the mapping: Order is an entity in table orders with a generated id, a mandatory customer and a list of items. note is a plain field.",
+            "template": "{{~@Entity}} {{@Table(name = \"orders\")}}\npublic class Order {\n    {{~@Id}} {{@GeneratedValue(strategy = GenerationType.IDENTITY)}}\n    private Long id;\n\n    {{@Column(nullable = false)}}\n    private String customer;\n\n    {{}}\n    private String note;\n\n    {{@OneToMany(mappedBy = \"order\")}}\n    private List<Item> items;\n}",
+            "redHerrings": [
+              "@Embedded",
+              "@ManyToOne",
+              "@Transient"
+            ],
+            "reusable": []
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "problemPaths": [],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "valid: kind, description, redHerrings and indent may be left out",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "solution": [
+              {
+                "code": "a"
+              },
+              {
+                "code": "b"
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "problemPaths": [],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "valid: trailing blanks in code are dropped",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a  ",
+                "indent": 0
+              },
+              {
+                "code": "b\t",
+                "indent": 0
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "problemPaths": [],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "warning: red herring that is also a template piece",
+      "input": {
+        "puzzles": [
+          {
+            "kind": "template",
+            "title": "T",
+            "description": "d",
+            "template": "{{a}} x {{b}}",
+            "redHerrings": [
+              "a"
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "problemPaths": [],
+        "warningPaths": [
+          "puzzles.0.redHerrings"
+        ]
+      }
+    },
+    {
+      "name": "warning: template without pieces",
+      "input": {
+        "puzzles": [
+          {
+            "kind": "template",
+            "title": "T",
+            "description": "d",
+            "template": "no gaps here"
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "problemPaths": [],
+        "warningPaths": [
+          "puzzles.0.template"
+        ]
+      }
+    },
+    {
+      "name": "error: top level is an array",
+      "input": [
+        {
+          "title": "T",
+          "description": "d",
+          "solution": [
+            {
+              "code": "a",
+              "indent": 0
+            },
+            {
+              "code": "b",
+              "indent": 0
+            }
+          ]
+        }
+      ],
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: no puzzles",
+      "input": {
+        "puzzles": []
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: more than 50 puzzles",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: puzzle is not an object",
+      "input": {
+        "puzzles": [
+          "x"
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: unknown kind",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ],
+            "kind": "blocks"
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.kind"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: missing title",
+      "input": {
+        "puzzles": [
+          {
+            "title": "  ",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.title"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: title too long",
+      "input": {
+        "puzzles": [
+          {
+            "title": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.title"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: description too long",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.description"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: solution is not an array",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "d",
+            "solution": "a"
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.solution"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: fewer than 2 solution lines",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.solution"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: more than 30 solution lines",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "l0",
+                "indent": 0
+              },
+              {
+                "code": "l1",
+                "indent": 0
+              },
+              {
+                "code": "l2",
+                "indent": 0
+              },
+              {
+                "code": "l3",
+                "indent": 0
+              },
+              {
+                "code": "l4",
+                "indent": 0
+              },
+              {
+                "code": "l5",
+                "indent": 0
+              },
+              {
+                "code": "l6",
+                "indent": 0
+              },
+              {
+                "code": "l7",
+                "indent": 0
+              },
+              {
+                "code": "l8",
+                "indent": 0
+              },
+              {
+                "code": "l9",
+                "indent": 0
+              },
+              {
+                "code": "l10",
+                "indent": 0
+              },
+              {
+                "code": "l11",
+                "indent": 0
+              },
+              {
+                "code": "l12",
+                "indent": 0
+              },
+              {
+                "code": "l13",
+                "indent": 0
+              },
+              {
+                "code": "l14",
+                "indent": 0
+              },
+              {
+                "code": "l15",
+                "indent": 0
+              },
+              {
+                "code": "l16",
+                "indent": 0
+              },
+              {
+                "code": "l17",
+                "indent": 0
+              },
+              {
+                "code": "l18",
+                "indent": 0
+              },
+              {
+                "code": "l19",
+                "indent": 0
+              },
+              {
+                "code": "l20",
+                "indent": 0
+              },
+              {
+                "code": "l21",
+                "indent": 0
+              },
+              {
+                "code": "l22",
+                "indent": 0
+              },
+              {
+                "code": "l23",
+                "indent": 0
+              },
+              {
+                "code": "l24",
+                "indent": 0
+              },
+              {
+                "code": "l25",
+                "indent": 0
+              },
+              {
+                "code": "l26",
+                "indent": 0
+              },
+              {
+                "code": "l27",
+                "indent": 0
+              },
+              {
+                "code": "l28",
+                "indent": 0
+              },
+              {
+                "code": "l29",
+                "indent": 0
+              },
+              {
+                "code": "l30",
+                "indent": 0
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.solution"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: more than 10 red herring lines",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ],
+            "redHerrings": [
+              {
+                "code": "h0",
+                "indent": 0
+              },
+              {
+                "code": "h1",
+                "indent": 0
+              },
+              {
+                "code": "h2",
+                "indent": 0
+              },
+              {
+                "code": "h3",
+                "indent": 0
+              },
+              {
+                "code": "h4",
+                "indent": 0
+              },
+              {
+                "code": "h5",
+                "indent": 0
+              },
+              {
+                "code": "h6",
+                "indent": 0
+              },
+              {
+                "code": "h7",
+                "indent": 0
+              },
+              {
+                "code": "h8",
+                "indent": 0
+              },
+              {
+                "code": "h9",
+                "indent": 0
+              },
+              {
+                "code": "h10",
+                "indent": 0
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.redHerrings"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: line is not an object",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              "a",
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.solution.0"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: line has an id",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "id": 1,
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.solution.0.id"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: code is not a string",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": 1
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.solution.0.code"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: empty code",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "   ",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.solution.0.code"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: code too long",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.solution.0.code"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: code with a line break",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a\nb",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.solution.0.code"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: leading spaces instead of indent",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "    b",
+                "indent": 0
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.solution.1.code"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: indent out of range or not an integer",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 7
+              },
+              {
+                "code": "b",
+                "indent": 1.5
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.solution.0.indent",
+          "puzzles.0.solution.1.indent"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: red herring equal to a solution line",
+      "input": {
+        "puzzles": [
+          {
+            "title": "T",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ],
+            "redHerrings": [
+              {
+                "code": "b ",
+                "indent": 0
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.redHerrings.0"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: template is not a string",
+      "input": {
+        "puzzles": [
+          {
+            "kind": "template",
+            "title": "T",
+            "description": "d",
+            "template": 3
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.template"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: template syntax",
+      "input": {
+        "puzzles": [
+          {
+            "kind": "template",
+            "title": "T",
+            "description": "d",
+            "template": "ok\n{{a}} {{~b}}"
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.template"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: red herrings are not strings",
+      "input": {
+        "puzzles": [
+          {
+            "kind": "template",
+            "title": "T",
+            "description": "d",
+            "template": "{{a}} x {{b}}",
+            "redHerrings": [
+              {
+                "code": "x"
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.redHerrings"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: reusable text that occurs nowhere",
+      "input": {
+        "puzzles": [
+          {
+            "kind": "template",
+            "title": "T",
+            "description": "d",
+            "template": "{{a}} x {{b}}",
+            "reusable": [
+              "zz"
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.redHerrings"
+        ],
+        "warningPaths": []
+      }
+    },
+    {
+      "name": "error: problems in several puzzles",
+      "input": {
+        "puzzles": [
+          {
+            "title": "",
+            "description": "d",
+            "solution": [
+              {
+                "code": "a",
+                "indent": 0
+              },
+              {
+                "code": "b",
+                "indent": 0
+              }
+            ]
+          },
+          {
+            "kind": "template",
+            "title": "T",
+            "description": "d",
+            "template": "{{abc"
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "problemPaths": [
+          "puzzles.0.title",
+          "puzzles.1.template"
+        ],
+        "warningPaths": []
+      }
+    }
+  ]
+}

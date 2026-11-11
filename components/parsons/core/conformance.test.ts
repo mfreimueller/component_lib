@@ -39,6 +39,11 @@ const run: Record<string, (input: any) => unknown> = {
   shuffled: ({ items, seed }) => core.shuffled(items, seed),
   mixSeed: ({ seed, salt }) => core.mixSeed(seed, salt),
   round2: (input) => ('round2' in input ? core.round2(input.round2) : core.round2(core.mean(input.meanRounded))),
+  validate: (input) => {
+    const r = core.validatePuzzleFile(input);
+    const paths = (ps: core.Problem[]) => ps.map((p) => p.path).sort();
+    return { ok: r.ok, problemPaths: paths(r.problems), warningPaths: paths(r.warnings) };
+  },
 };
 
 const files = readdirSync(dir).filter((f) => f.endsWith('.json'));
