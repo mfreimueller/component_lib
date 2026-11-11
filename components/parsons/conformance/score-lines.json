@@ -1,0 +1,408 @@
+{
+  "function": "linePercent",
+  "description": "Line puzzles. flags: per placed line, right line in that slot. percentRounded: round2(linePercent).",
+  "cases": [
+    {
+      "name": "exact solution",
+      "input": {
+        "solution": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "placed": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ]
+      },
+      "expected": {
+        "flags": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "percentRounded": 100
+      }
+    },
+    {
+      "name": "one swapped pair loses two slots",
+      "input": {
+        "solution": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "placed": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ]
+      },
+      "expected": {
+        "flags": [
+          true,
+          false,
+          false,
+          true
+        ],
+        "percentRounded": 50
+      }
+    },
+    {
+      "name": "a missing early line fails everything after it",
+      "input": {
+        "solution": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "placed": [
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ]
+      },
+      "expected": {
+        "flags": [
+          false,
+          false,
+          false
+        ],
+        "percentRounded": 0
+      }
+    },
+    {
+      "name": "red herring in a slot is wrong",
+      "input": {
+        "solution": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "placed": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(n)",
+            "indent": 1
+          }
+        ]
+      },
+      "expected": {
+        "flags": [
+          true,
+          true,
+          true,
+          false
+        ],
+        "percentRounded": 75
+      }
+    },
+    {
+      "name": "wrong indentation is wrong",
+      "input": {
+        "solution": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "placed": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 0
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ]
+      },
+      "expected": {
+        "flags": [
+          true,
+          true,
+          false,
+          true
+        ],
+        "percentRounded": 75
+      }
+    },
+    {
+      "name": "nothing placed",
+      "input": {
+        "solution": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "placed": []
+      },
+      "expected": {
+        "flags": [],
+        "percentRounded": 0
+      }
+    },
+    {
+      "name": "extra pieces past the end are ignored",
+      "input": {
+        "solution": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          }
+        ],
+        "placed": [
+          {
+            "code": "n = 5",
+            "indent": 0
+          },
+          {
+            "code": "for i in range(1, 11):",
+            "indent": 0
+          },
+          {
+            "code": "print(n * i)",
+            "indent": 1
+          },
+          {
+            "code": "print(\"done\")",
+            "indent": 0
+          },
+          {
+            "code": "extra",
+            "indent": 0
+          }
+        ]
+      },
+      "expected": {
+        "flags": [
+          true,
+          true,
+          true,
+          true,
+          false
+        ],
+        "percentRounded": 100
+      }
+    },
+    {
+      "name": "identical lines are interchangeable",
+      "input": {
+        "solution": [
+          {
+            "code": "pass",
+            "indent": 1
+          },
+          {
+            "code": "pass",
+            "indent": 1
+          }
+        ],
+        "placed": [
+          {
+            "code": "pass",
+            "indent": 1
+          },
+          {
+            "code": "pass",
+            "indent": 1
+          }
+        ]
+      },
+      "expected": {
+        "flags": [
+          true,
+          true
+        ],
+        "percentRounded": 100
+      }
+    },
+    {
+      "name": "one of three",
+      "input": {
+        "solution": [
+          {
+            "code": "a",
+            "indent": 0
+          },
+          {
+            "code": "b",
+            "indent": 0
+          },
+          {
+            "code": "c",
+            "indent": 0
+          }
+        ],
+        "placed": [
+          {
+            "code": "a",
+            "indent": 0
+          }
+        ]
+      },
+      "expected": {
+        "flags": [
+          true
+        ],
+        "percentRounded": 33.33
+      }
+    },
+    {
+      "name": "empty solution",
+      "input": {
+        "solution": [],
+        "placed": []
+      },
+      "expected": {
+        "flags": [],
+        "percentRounded": 0
+      }
+    }
+  ]
+}

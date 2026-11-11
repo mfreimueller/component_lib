@@ -1,0 +1,83 @@
+{
+  "function": "round2",
+  "description": "round2(x) = Math.round(x * 100) / 100 in IEEE double: multiply first, then round halves towards +infinity (not to even). meanRounded: round2 of the unrounded average, 0 for no values.",
+  "cases": [
+    {
+      "name": "round2: one third",
+      "input": {
+        "round2": 33.333333333333336
+      },
+      "expected": 33.33
+    },
+    {
+      "name": "round2: two thirds",
+      "input": {
+        "round2": 66.66666666666667
+      },
+      "expected": 66.67
+    },
+    {
+      "name": "round2: 0.125",
+      "input": {
+        "round2": 0.125
+      },
+      "expected": 0.13
+    },
+    {
+      "name": "round2: 0.135",
+      "input": {
+        "round2": 0.135
+      },
+      "expected": 0.14
+    },
+    {
+      "name": "round2: 2.675",
+      "input": {
+        "round2": 2.675
+      },
+      "expected": 2.68
+    },
+    {
+      "name": "round2: negative half goes towards +infinity",
+      "input": {
+        "round2": -0.125
+      },
+      "expected": -0.12
+    },
+    {
+      "name": "round2: 1.005",
+      "input": {
+        "round2": 1.005
+      },
+      "expected": 1
+    },
+    {
+      "name": "round2(mean([100,75,60]))",
+      "input": {
+        "meanRounded": [
+          100,
+          75,
+          60
+        ]
+      },
+      "expected": 78.33
+    },
+    {
+      "name": "round2(mean([100,66.66666666666666]))",
+      "input": {
+        "meanRounded": [
+          100,
+          66.66666666666666
+        ]
+      },
+      "expected": 83.33
+    },
+    {
+      "name": "round2(mean([]))",
+      "input": {
+        "meanRounded": []
+      },
+      "expected": 0
+    }
+  ]
+}

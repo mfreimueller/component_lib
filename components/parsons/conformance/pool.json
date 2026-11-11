@@ -1,0 +1,129 @@
+{
+  "function": "buildPool",
+  "description": "Pool tiles for a template puzzle. errorCount: number of errors (messages are not compared).",
+  "cases": [
+    {
+      "name": "one tile per occurrence, one per reusable text, herrings last",
+      "input": {
+        "template": "{{SELECT}} {{a}}\n{{SELECT}} {{)}}\n{{)}}",
+        "redHerrings": [
+          "GROUP BY"
+        ],
+        "reusable": [
+          "SELECT"
+        ]
+      },
+      "expected": {
+        "tiles": [
+          {
+            "text": "SELECT",
+            "reusable": true,
+            "herring": false
+          },
+          {
+            "text": "a",
+            "reusable": false,
+            "herring": false
+          },
+          {
+            "text": ")",
+            "reusable": false,
+            "herring": false
+          },
+          {
+            "text": ")",
+            "reusable": false,
+            "herring": false
+          },
+          {
+            "text": "GROUP BY",
+            "reusable": false,
+            "herring": true
+          }
+        ],
+        "errorCount": 0
+      }
+    },
+    {
+      "name": "reusable red herring, normalised",
+      "input": {
+        "template": "{{a}}",
+        "redHerrings": [
+          "  HAVING   x "
+        ],
+        "reusable": [
+          "HAVING x"
+        ]
+      },
+      "expected": {
+        "tiles": [
+          {
+            "text": "a",
+            "reusable": false,
+            "herring": false
+          },
+          {
+            "text": "HAVING x",
+            "reusable": true,
+            "herring": true
+          }
+        ],
+        "errorCount": 0
+      }
+    },
+    {
+      "name": "error: reusable text that occurs nowhere",
+      "input": {
+        "template": "{{a}}",
+        "redHerrings": [],
+        "reusable": [
+          "b"
+        ]
+      },
+      "expected": {
+        "errorCount": 1
+      }
+    },
+    {
+      "name": "error: more than 15 red herrings",
+      "input": {
+        "template": "{{a}}",
+        "redHerrings": [
+          "h0",
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6",
+          "h7",
+          "h8",
+          "h9",
+          "h10",
+          "h11",
+          "h12",
+          "h13",
+          "h14",
+          "h15"
+        ],
+        "reusable": []
+      },
+      "expected": {
+        "errorCount": 1
+      }
+    },
+    {
+      "name": "error: empty red herring",
+      "input": {
+        "template": "{{a}}",
+        "redHerrings": [
+          "  "
+        ],
+        "reusable": []
+      },
+      "expected": {
+        "errorCount": 1
+      }
+    }
+  ]
+}

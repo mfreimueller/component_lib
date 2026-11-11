@@ -1,0 +1,493 @@
+{
+  "function": "templatePercent",
+  "description": "Template puzzles. placed[g] = piece texts in gap g (missing entries = empty). flags[g] = correctFlags(gaps[g], placed[g]).",
+  "cases": [
+    {
+      "name": "solution with a decoy gap left empty",
+      "input": {
+        "gaps": [
+          {
+            "expected": [
+              "a",
+              "b"
+            ],
+            "anyOrder": false
+          },
+          {
+            "expected": [],
+            "anyOrder": false
+          }
+        ],
+        "placed": [
+          [
+            "a",
+            "b"
+          ],
+          []
+        ]
+      },
+      "expected": {
+        "flags": [
+          [
+            true,
+            true
+          ],
+          []
+        ],
+        "percentRounded": 100
+      }
+    },
+    {
+      "name": "missing piece counts against expected length",
+      "input": {
+        "gaps": [
+          {
+            "expected": [
+              "a",
+              "b"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "placed": [
+          [
+            "a"
+          ]
+        ]
+      },
+      "expected": {
+        "flags": [
+          [
+            true
+          ]
+        ],
+        "percentRounded": 50
+      }
+    },
+    {
+      "name": "extra piece counts against placed length",
+      "input": {
+        "gaps": [
+          {
+            "expected": [
+              "a"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "placed": [
+          [
+            "a",
+            "x"
+          ]
+        ]
+      },
+      "expected": {
+        "flags": [
+          [
+            true,
+            false
+          ]
+        ],
+        "percentRounded": 50
+      }
+    },
+    {
+      "name": "red herring only",
+      "input": {
+        "gaps": [
+          {
+            "expected": [
+              "a"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "placed": [
+          [
+            "herring"
+          ]
+        ]
+      },
+      "expected": {
+        "flags": [
+          [
+            false
+          ]
+        ],
+        "percentRounded": 0
+      }
+    },
+    {
+      "name": "anything in an empty gap is penalised",
+      "input": {
+        "gaps": [
+          {
+            "expected": [
+              "a"
+            ],
+            "anyOrder": false
+          },
+          {
+            "expected": [],
+            "anyOrder": false
+          }
+        ],
+        "placed": [
+          [
+            "a"
+          ],
+          [
+            "x"
+          ]
+        ]
+      },
+      "expected": {
+        "flags": [
+          [
+            true
+          ],
+          [
+            false
+          ]
+        ],
+        "percentRounded": 50
+      }
+    },
+    {
+      "name": "ordered gap uses LCS",
+      "input": {
+        "gaps": [
+          {
+            "expected": [
+              "a",
+              "b",
+              "c"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "placed": [
+          [
+            "b",
+            "a",
+            "c"
+          ]
+        ]
+      },
+      "expected": {
+        "flags": [
+          [
+            true,
+            false,
+            true
+          ]
+        ],
+        "percentRounded": 66.67
+      }
+    },
+    {
+      "name": "ordered gap, swapped pair",
+      "input": {
+        "gaps": [
+          {
+            "expected": [
+              "a",
+              "b"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "placed": [
+          [
+            "b",
+            "a"
+          ]
+        ]
+      },
+      "expected": {
+        "flags": [
+          [
+            true,
+            false
+          ]
+        ],
+        "percentRounded": 50
+      }
+    },
+    {
+      "name": "LCS backtrack takes the earliest match",
+      "input": {
+        "gaps": [
+          {
+            "expected": [
+              "a",
+              "b"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "placed": [
+          [
+            "a",
+            "a",
+            "b"
+          ]
+        ]
+      },
+      "expected": {
+        "flags": [
+          [
+            true,
+            false,
+            true
+          ]
+        ],
+        "percentRounded": 66.67
+      }
+    },
+    {
+      "name": "LCS backtrack with a leading wrong piece",
+      "input": {
+        "gaps": [
+          {
+            "expected": [
+              "a",
+              "b"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "placed": [
+          [
+            "x",
+            "b",
+            "a"
+          ]
+        ]
+      },
+      "expected": {
+        "flags": [
+          [
+            false,
+            true,
+            false
+          ]
+        ],
+        "percentRounded": 33.33
+      }
+    },
+    {
+      "name": "any-order gap ignores order",
+      "input": {
+        "gaps": [
+          {
+            "expected": [
+              "a",
+              "b"
+            ],
+            "anyOrder": true
+          }
+        ],
+        "placed": [
+          [
+            "b",
+            "a"
+          ]
+        ]
+      },
+      "expected": {
+        "flags": [
+          [
+            true,
+            true
+          ]
+        ],
+        "percentRounded": 100
+      }
+    },
+    {
+      "name": "any-order gap counts copies",
+      "input": {
+        "gaps": [
+          {
+            "expected": [
+              "a",
+              "b"
+            ],
+            "anyOrder": true
+          }
+        ],
+        "placed": [
+          [
+            "b",
+            "b"
+          ]
+        ]
+      },
+      "expected": {
+        "flags": [
+          [
+            true,
+            false
+          ]
+        ],
+        "percentRounded": 50
+      }
+    },
+    {
+      "name": "any-order gap, multiset, earlier copies first",
+      "input": {
+        "gaps": [
+          {
+            "expected": [
+              "a",
+              "b"
+            ],
+            "anyOrder": true
+          }
+        ],
+        "placed": [
+          [
+            "b",
+            "x",
+            "a",
+            "a"
+          ]
+        ]
+      },
+      "expected": {
+        "flags": [
+          [
+            true,
+            false,
+            true,
+            false
+          ]
+        ],
+        "percentRounded": 50
+      }
+    },
+    {
+      "name": "nothing placed",
+      "input": {
+        "gaps": [
+          {
+            "expected": [
+              "a"
+            ],
+            "anyOrder": false
+          },
+          {
+            "expected": [
+              "b"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "placed": [
+          [],
+          []
+        ]
+      },
+      "expected": {
+        "flags": [
+          [],
+          []
+        ],
+        "percentRounded": 0
+      }
+    },
+    {
+      "name": "nothing placed, nothing expected",
+      "input": {
+        "gaps": [
+          {
+            "expected": [],
+            "anyOrder": false
+          }
+        ],
+        "placed": [
+          []
+        ]
+      },
+      "expected": {
+        "flags": [
+          []
+        ],
+        "percentRounded": 0
+      }
+    },
+    {
+      "name": "reusable piece placed twice",
+      "input": {
+        "gaps": [
+          {
+            "expected": [
+              "SELECT"
+            ],
+            "anyOrder": false
+          },
+          {
+            "expected": [
+              "SELECT"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "placed": [
+          [
+            "SELECT"
+          ],
+          [
+            "SELECT"
+          ]
+        ]
+      },
+      "expected": {
+        "flags": [
+          [
+            true
+          ],
+          [
+            true
+          ]
+        ],
+        "percentRounded": 100
+      }
+    },
+    {
+      "name": "missing gaps in placed count as empty",
+      "input": {
+        "gaps": [
+          {
+            "expected": [
+              "a"
+            ],
+            "anyOrder": false
+          },
+          {
+            "expected": [
+              "b"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "placed": [
+          [
+            "a"
+          ]
+        ]
+      },
+      "expected": {
+        "flags": [
+          [
+            true
+          ],
+          []
+        ],
+        "percentRounded": 50
+      }
+    }
+  ]
+}

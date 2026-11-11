@@ -1,0 +1,492 @@
+{
+  "function": "parseTemplate",
+  "description": "Template parser. errorLines: 1-based line of every error, sorted ascending (messages and emission order are not compared).",
+  "cases": [
+    {
+      "name": "fixed text and gaps in reading order",
+      "input": {
+        "source": "int x = {{1}};\nreturn {{x}} + {{y}};"
+      },
+      "expected": {
+        "lines": [
+          [
+            {
+              "text": "int x = "
+            },
+            {
+              "gap": 0
+            },
+            {
+              "text": ";"
+            }
+          ],
+          [
+            {
+              "text": "return "
+            },
+            {
+              "gap": 1
+            },
+            {
+              "text": " + "
+            },
+            {
+              "gap": 2
+            },
+            {
+              "text": ";"
+            }
+          ]
+        ],
+        "gaps": [
+          {
+            "index": 0,
+            "expected": [
+              "1"
+            ],
+            "anyOrder": false
+          },
+          {
+            "index": 1,
+            "expected": [
+              "x"
+            ],
+            "anyOrder": false
+          },
+          {
+            "index": 2,
+            "expected": [
+              "y"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "pieces": [
+          "1",
+          "x",
+          "y"
+        ],
+        "errorLines": []
+      }
+    },
+    {
+      "name": "markers separated by blanks form one gap",
+      "input": {
+        "source": "{{SELECT}} {{e.name}}\t{{FROM}}{{t}}"
+      },
+      "expected": {
+        "lines": [
+          [
+            {
+              "gap": 0
+            }
+          ]
+        ],
+        "gaps": [
+          {
+            "index": 0,
+            "expected": [
+              "SELECT",
+              "e.name",
+              "FROM",
+              "t"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "pieces": [
+          "SELECT",
+          "e.name",
+          "FROM",
+          "t"
+        ],
+        "errorLines": []
+      }
+    },
+    {
+      "name": "fixed text between markers splits gaps",
+      "input": {
+        "source": "{{a}}, {{b}}"
+      },
+      "expected": {
+        "lines": [
+          [
+            {
+              "gap": 0
+            },
+            {
+              "text": ", "
+            },
+            {
+              "gap": 1
+            }
+          ]
+        ],
+        "gaps": [
+          {
+            "index": 0,
+            "expected": [
+              "a"
+            ],
+            "anyOrder": false
+          },
+          {
+            "index": 1,
+            "expected": [
+              "b"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "pieces": [
+          "a",
+          "b"
+        ],
+        "errorLines": []
+      }
+    },
+    {
+      "name": "context and blank lines",
+      "input": {
+        "source": "class A {\n\n}"
+      },
+      "expected": {
+        "lines": [
+          [
+            {
+              "text": "class A {"
+            }
+          ],
+          [],
+          [
+            {
+              "text": "}"
+            }
+          ]
+        ],
+        "gaps": [],
+        "pieces": [],
+        "errorLines": []
+      }
+    },
+    {
+      "name": "tabs in indentation become four spaces, trailing blanks dropped",
+      "input": {
+        "source": "\t\tfoo({{a}})   \t"
+      },
+      "expected": {
+        "lines": [
+          [
+            {
+              "text": "        foo("
+            },
+            {
+              "gap": 0
+            },
+            {
+              "text": ")"
+            }
+          ]
+        ],
+        "gaps": [
+          {
+            "index": 0,
+            "expected": [
+              "a"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "pieces": [
+          "a"
+        ],
+        "errorLines": []
+      }
+    },
+    {
+      "name": "CRLF line ends",
+      "input": {
+        "source": "a {{b}}\r\nc"
+      },
+      "expected": {
+        "lines": [
+          [
+            {
+              "text": "a "
+            },
+            {
+              "gap": 0
+            }
+          ],
+          [
+            {
+              "text": "c"
+            }
+          ]
+        ],
+        "gaps": [
+          {
+            "index": 0,
+            "expected": [
+              "b"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "pieces": [
+          "b"
+        ],
+        "errorLines": []
+      }
+    },
+    {
+      "name": "piece whitespace is trimmed and collapsed",
+      "input": {
+        "source": "{{  a   \t b  }}"
+      },
+      "expected": {
+        "lines": [
+          [
+            {
+              "gap": 0
+            }
+          ]
+        ],
+        "gaps": [
+          {
+            "index": 0,
+            "expected": [
+              "a b"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "pieces": [
+          "a b"
+        ],
+        "errorLines": []
+      }
+    },
+    {
+      "name": "any-order gap",
+      "input": {
+        "source": "{{~@Id}} {{@Gen}}"
+      },
+      "expected": {
+        "lines": [
+          [
+            {
+              "gap": 0
+            }
+          ]
+        ],
+        "gaps": [
+          {
+            "index": 0,
+            "expected": [
+              "@Id",
+              "@Gen"
+            ],
+            "anyOrder": true
+          }
+        ],
+        "pieces": [
+          "@Id",
+          "@Gen"
+        ],
+        "errorLines": []
+      }
+    },
+    {
+      "name": "empty gap",
+      "input": {
+        "source": "a\n{{}}\nb"
+      },
+      "expected": {
+        "lines": [
+          [
+            {
+              "text": "a"
+            }
+          ],
+          [
+            {
+              "gap": 0
+            }
+          ],
+          [
+            {
+              "text": "b"
+            }
+          ]
+        ],
+        "gaps": [
+          {
+            "index": 0,
+            "expected": [],
+            "anyOrder": false
+          }
+        ],
+        "pieces": [],
+        "errorLines": []
+      }
+    },
+    {
+      "name": "escapes",
+      "input": {
+        "source": "x = \\{{ not a marker }};\n{{a \\}} b}} {{\\~c}}"
+      },
+      "expected": {
+        "lines": [
+          [
+            {
+              "text": "x = {{ not a marker }};"
+            }
+          ],
+          [
+            {
+              "gap": 0
+            }
+          ]
+        ],
+        "gaps": [
+          {
+            "index": 0,
+            "expected": [
+              "a }} b",
+              "~c"
+            ],
+            "anyOrder": false
+          }
+        ],
+        "pieces": [
+          "a }} b",
+          "~c"
+        ],
+        "errorLines": []
+      }
+    },
+    {
+      "name": "error: empty gap next to a marker",
+      "input": {
+        "source": "{{}} {{a}}"
+      },
+      "expected": {
+        "errorLines": [
+          1
+        ]
+      }
+    },
+    {
+      "name": "error: empty gap after a marker",
+      "input": {
+        "source": "x\n{{a}}{{}}"
+      },
+      "expected": {
+        "errorLines": [
+          2
+        ]
+      }
+    },
+    {
+      "name": "error: {{~}}",
+      "input": {
+        "source": "{{~}}"
+      },
+      "expected": {
+        "errorLines": [
+          1
+        ]
+      }
+    },
+    {
+      "name": "error: blank marker",
+      "input": {
+        "source": "a\nb\n{{  }}"
+      },
+      "expected": {
+        "errorLines": [
+          3
+        ]
+      }
+    },
+    {
+      "name": "error: unclosed marker",
+      "input": {
+        "source": "ok\n{{abc"
+      },
+      "expected": {
+        "errorLines": [
+          2
+        ]
+      }
+    },
+    {
+      "name": "error: ~ on a later marker",
+      "input": {
+        "source": "{{a}} {{~b}}"
+      },
+      "expected": {
+        "errorLines": [
+          1
+        ]
+      }
+    },
+    {
+      "name": "error: piece too long",
+      "input": {
+        "source": "{{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}}"
+      },
+      "expected": {
+        "errorLines": [
+          1
+        ]
+      }
+    },
+    {
+      "name": "error: more than 80 lines",
+      "input": {
+        "source": "x\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\nx\n"
+      },
+      "expected": {
+        "errorLines": [
+          81
+        ]
+      }
+    },
+    {
+      "name": "error: more than 6000 characters",
+      "input": {
+        "source": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      "expected": {
+        "errorLines": [
+          1
+        ]
+      }
+    },
+    {
+      "name": "error: more than 30 gaps",
+      "input": {
+        "source": "{{p0}}\n{{p1}}\n{{p2}}\n{{p3}}\n{{p4}}\n{{p5}}\n{{p6}}\n{{p7}}\n{{p8}}\n{{p9}}\n{{p10}}\n{{p11}}\n{{p12}}\n{{p13}}\n{{p14}}\n{{p15}}\n{{p16}}\n{{p17}}\n{{p18}}\n{{p19}}\n{{p20}}\n{{p21}}\n{{p22}}\n{{p23}}\n{{p24}}\n{{p25}}\n{{p26}}\n{{p27}}\n{{p28}}\n{{p29}}\n{{p30}}"
+      },
+      "expected": {
+        "errorLines": [
+          31
+        ]
+      }
+    },
+    {
+      "name": "error: more than 60 pieces",
+      "input": {
+        "source": "{{p0}} x {{q0}}\n{{p1}} x {{q1}}\n{{p2}} x {{q2}}\n{{p3}} x {{q3}}\n{{p4}} x {{q4}}\n{{p5}} x {{q5}}\n{{p6}} x {{q6}}\n{{p7}} x {{q7}}\n{{p8}} x {{q8}}\n{{p9}} x {{q9}}\n{{p10}} x {{q10}}\n{{p11}} x {{q11}}\n{{p12}} x {{q12}}\n{{p13}} x {{q13}}\n{{p14}} x {{q14}}\n{{p15}} x {{q15}}\n{{p16}} x {{q16}}\n{{p17}} x {{q17}}\n{{p18}} x {{q18}}\n{{p19}} x {{q19}}\n{{p20}} x {{q20}}\n{{p21}} x {{q21}}\n{{p22}} x {{q22}}\n{{p23}} x {{q23}}\n{{p24}} x {{q24}}\n{{p25}} x {{q25}}\n{{p26}} x {{q26}}\n{{p27}} x {{q27}}\n{{p28}} x {{q28}}\n{{p29}} x {{q29}}\n{{a}}"
+      },
+      "expected": {
+        "errorLines": [
+          16,
+          31
+        ]
+      }
+    }
+  ]
+}

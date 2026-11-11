@@ -1,0 +1,232 @@
+{
+  "function": "shuffled",
+  "description": "Seeded Fisher-Yates with mulberry32, unsigned 32-bit arithmetic. Seeds are taken modulo 2^32.",
+  "cases": [
+    {
+      "name": "8 items, seed 0",
+      "input": {
+        "items": [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e",
+          "f",
+          "g",
+          "h"
+        ],
+        "seed": 0
+      },
+      "expected": [
+        "e",
+        "h",
+        "d",
+        "f",
+        "g",
+        "b",
+        "a",
+        "c"
+      ]
+    },
+    {
+      "name": "8 items, seed 1",
+      "input": {
+        "items": [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e",
+          "f",
+          "g",
+          "h"
+        ],
+        "seed": 1
+      },
+      "expected": [
+        "c",
+        "b",
+        "g",
+        "h",
+        "e",
+        "d",
+        "a",
+        "f"
+      ]
+    },
+    {
+      "name": "8 items, seed 42",
+      "input": {
+        "items": [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e",
+          "f",
+          "g",
+          "h"
+        ],
+        "seed": 42
+      },
+      "expected": [
+        "c",
+        "h",
+        "b",
+        "a",
+        "g",
+        "f",
+        "d",
+        "e"
+      ]
+    },
+    {
+      "name": "8 items, seed 4294967295",
+      "input": {
+        "items": [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e",
+          "f",
+          "g",
+          "h"
+        ],
+        "seed": 4294967295
+      },
+      "expected": [
+        "a",
+        "c",
+        "g",
+        "d",
+        "f",
+        "e",
+        "b",
+        "h"
+      ]
+    },
+    {
+      "name": "8 items, seed -1",
+      "input": {
+        "items": [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e",
+          "f",
+          "g",
+          "h"
+        ],
+        "seed": -1
+      },
+      "expected": [
+        "a",
+        "c",
+        "g",
+        "d",
+        "f",
+        "e",
+        "b",
+        "h"
+      ]
+    },
+    {
+      "name": "8 items, seed 123456789",
+      "input": {
+        "items": [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e",
+          "f",
+          "g",
+          "h"
+        ],
+        "seed": 123456789
+      },
+      "expected": [
+        "a",
+        "d",
+        "h",
+        "f",
+        "b",
+        "e",
+        "g",
+        "c"
+      ]
+    },
+    {
+      "name": "20 items, seed 7",
+      "input": {
+        "items": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "seed": 7
+      },
+      "expected": [
+        9,
+        19,
+        7,
+        4,
+        5,
+        10,
+        12,
+        16,
+        18,
+        2,
+        15,
+        13,
+        3,
+        14,
+        6,
+        8,
+        11,
+        17,
+        1,
+        0
+      ]
+    },
+    {
+      "name": "empty",
+      "input": {
+        "items": [],
+        "seed": 1
+      },
+      "expected": []
+    },
+    {
+      "name": "one item",
+      "input": {
+        "items": [
+          "x"
+        ],
+        "seed": 1
+      },
+      "expected": [
+        "x"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "function": "mixSeed",
+  "description": "Mixes a seed with a salt (e.g. puzzle id). Unsigned 32-bit result.",
+  "cases": [
+    {
+      "name": "seed 42, salt 1",
+      "input": {
+        "seed": 42,
+        "salt": 1
+      },
+      "expected": 2730589350
+    },
+    {
+      "name": "seed 42, salt 2",
+      "input": {
+        "seed": 42,
+        "salt": 2
+      },
+      "expected": 1702111963
+    },
+    {
+      "name": "seed 0, salt 0",
+      "input": {
+        "seed": 0,
+        "salt": 0
+      },
+      "expected": 3238976083
+    },
+    {
+      "name": "seed 4294967295, salt 7",
+      "input": {
+        "seed": 4294967295,
+        "salt": 7
+      },
+      "expected": 199761589
+    },
+    {
+      "name": "seed 123456789, salt 987654321",
+      "input": {
+        "seed": 123456789,
+        "salt": 987654321
+      },
+      "expected": 1697199753
+    }
+  ]
+}
